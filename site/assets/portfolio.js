@@ -177,149 +177,74 @@ function validClientUrl(value) {
   }
 }
 
-function clientHoverMode() {
-  return window.matchMedia(
-    "(hover: hover) and (pointer: fine) and (min-width: 769px)",
-  ).matches;
-}
 function ClientCard({ client }) {
   const [broken, setBroken] = le.useState(false);
-  const [expanded, setExpanded] = le.useState(false);
-  const records = casesForClient(client.id);
-  const panelId = "client-cases-" + client.id;
-  const href = validClientUrl(client.url);
+  const [open, setOpen] = le.useState(false);
+  const triggerRef = le.useRef(null);
   const initials = client.name
     .split(/[\s.-]+/)
     .slice(0, 2)
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-  return i(
-    "article",
-    {
-      id: "client-" + client.id,
-      tabIndex: records.length ? 0 : undefined,
-      "aria-label": client.name,
-      className:
-        "client-card linked-client" + (expanded ? " client-expanded" : ""),
-      onMouseEnter: () => {
-        if (clientHoverMode()) setExpanded(true);
-      },
-      onMouseLeave: (event) => {
-        if (!(
-          event.currentTarget.contains(document.activeElement) &&
-          document.activeElement?.matches(":focus-visible")
-        ))
-          setExpanded(false);
-      },
-      onFocus: (event) => {
-        if (clientHoverMode() && event.target.matches(":focus-visible"))
-          setExpanded(true);
-      },
-      onKeyDown: (event) => {
-        if (event.key === "Escape") {
-          event.currentTarget.focus();
-          setExpanded(false);
-        }
-      },
-      onBlur: (event) => {
-        if (!event.currentTarget.contains(event.relatedTarget))
-          setExpanded(false);
-      },
-      children: [
-        i("div", {
-          className:
-            "client-logo" +
-            (client.logoDark && !broken ? " client-logo-dark" : ""),
-          children:
-            client.logo && !broken
-              ? i("img", {
-                  src: client.logo,
-                  alt: client.name,
-                  loading: "lazy",
-                  width: 180,
-                  height: 72,
-                  onError: () => setBroken(true),
-                })
-              : i("span", {
-                  className: "client-monogram",
-                  style: { background: client.color },
-                  "aria-hidden": true,
-                  children: initials,
-                }),
-        }),
-        i("h3", { children: client.name }),
-        i("div", {
-          className: "client-card-actions",
-          children: [
-            records.length
-              ? i("span", {
-                  className: "client-hover-label",
-                  "aria-hidden": true,
-                  children: [translateText("Cases"), " · ", records.length],
-                })
-              : null,
-            records.length
-              ? i("button", {
-                  type: "button",
-                  className: "client-cases-toggle",
-                  "aria-expanded": expanded,
-                  "aria-controls": panelId,
-                  onClick: () => {
-                    if (!clientHoverMode()) setExpanded((value) => !value);
-                  },
-                  children: [
-                    i("span", { children: "Cases" }),
-                    i("span", {
-                      "aria-hidden": true,
-                      children: expanded ? "−" : "+",
-                    }),
-                  ],
-                })
-              : null,
-            href
-              ? i("a", {
-                  href,
-                  target: "_blank",
-                  className: "client-site-link",
-                  "data-outbound": "client-" + client.id,
-                  "aria-label":
-                    translateText("Client website") + ": " + client.name,
-                  children: "Website ↗",
-                })
-              : null,
-          ],
-        }),
-        records.length
-          ? i("div", {
-              id: panelId,
-              className: "client-case-panel",
-              hidden: !expanded,
-              children: [
-                i("div", {
-                  className: "client-case-tags",
-                  children: records.map((record) =>
-                    i(
-                      "a",
-                      {
-                        href: detailLink("case", record.id),
-                        "aria-label":
-                          caseCategoryLabel(record) +
-                          " — " +
-                          translateText(record.title),
-                        children: [caseCategoryLabel(record), " ↗"],
-                      },
-                      record.id,
-                    ),
-                  ),
-                }),
-              ],
-            })
-          : null,
-      ],
-    },
-    client.id || client.name,
-  );
+  const description =
+    typeof client.description === "string"
+      ? client.description
+      : client.description?.[currentLanguage] || client.description?.ru || "";
+  return i(Pi, {
+    children: [
+      i("article", {
+        id: "client-" + client.id,
+        className: "client-card linked-client",
+        children: [
+          i("div", {
+            className:
+              "client-logo" +
+              (client.logoDark && !broken ? " client-logo-dark" : ""),
+            children:
+              client.logo && !broken
+                ? i("img", {
+                    src: client.logo,
+                    alt: client.name,
+                    loading: "lazy",
+                    width: 180,
+                    height: 72,
+                    onError: () => setBroken(true),
+                  })
+                : i("span", {
+                    className: "client-monogram",
+                    style: { background: client.color },
+                    "aria-hidden": true,
+                    children: initials,
+                  }),
+          }),
+          i("h3", { children: client.name }),
+          i("p", { children: description }),
+          i("span", {
+            className: "client-card-cue",
+            "aria-hidden": true,
+            children: "↗",
+          }),
+          i("button", {
+            ref: triggerRef,
+            type: "button",
+            className: "client-card-trigger",
+            "aria-label":
+              translateText("Open client projects") + ": " + client.name,
+            "aria-haspopup": "dialog",
+            onClick: () => setOpen(true),
+          }),
+        ],
+      }),
+      open
+        ? i(ClientCasesDialog, {
+            client,
+            returnFocusRef: triggerRef,
+            onClose: () => setOpen(false),
+          })
+        : null,
+    ],
+  });
 }
 
 function ProjectCard() {
@@ -329,11 +254,15 @@ function ProjectCard() {
     children: [
       i("div", {
         className: "project-logo",
-        "aria-hidden": true,
-        children: "+",
+        children: [
+          i("span", { children: "Your logo" }),
+          i("small", { children: window.PORTFOLIO.name }),
+        ],
       }),
       i("h3", { children: "Your project" }),
-      i("span", { className: "project-invite", children: "Discuss the task" }),
+      i("p", {
+        children: "Let’s turn your advertising into your next growth story.",
+      }),
     ],
   });
 }

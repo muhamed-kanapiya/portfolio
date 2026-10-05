@@ -1695,14 +1695,7 @@ button.h-\[48px\] {
     transform: none !important;
   }
 }
-/* Compact logo directory; hover on desktop, explicit toggle on touch screens. */
-.client-card.linked-client,
-.client-card.project-card {
-  min-height: 154px;
-  padding: 16px 12px;
-  gap: 10px;
-  border-radius: 12px;
-}
+/* Original description cards; the full card opens a modal on every device. */
 .linked-client {
   position: relative;
   scroll-margin-top: 110px;
@@ -1711,150 +1704,178 @@ button.h-\[48px\] {
   border-color: #29785d;
   box-shadow: 0 0 0 3px #dcece4;
 }
-.linked-client.client-expanded {
-  z-index: 6;
-  border-color: #6aa28a;
+.linked-client:hover {
+  border-color: #8db39d;
 }
-.linked-client .client-logo {
-  height: 42px;
-  max-width: 130px;
-  margin: 0;
-  padding: 4px;
-  border-radius: 7px;
+.client-card-trigger {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+  cursor: pointer;
 }
-.linked-client .client-logo img {
-  max-height: 36px;
+.client-card-trigger:focus-visible {
+  outline: 2px solid #175c45;
+  outline-offset: 4px;
 }
-.linked-client .client-monogram {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  font-size: 13px;
-}
-.client-card.linked-client h3,
-.client-card.project-card h3 {
+.client-card-cue {
+  position: absolute;
+  top: 8px;
+  right: 10px;
   font-size: 12px;
-  line-height: 1.35;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
+  color: #8a9c91;
 }
-.client-card-actions {
+.client-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(720px, calc(100% - 32px));
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  border: 1px solid #e3e9e5;
+  border-radius: 24px;
+  background: #fff;
+  color: #18181b;
+  box-shadow: 0 28px 100px #102c2633;
+  overflow: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+.client-dialog::backdrop {
+  background: #10191699;
+  backdrop-filter: blur(6px);
+}
+.client-dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 25px 28px 20px;
+  background: white;
+  border-bottom: 1px solid #e7ece8;
+}
+.client-dialog-header h2 {
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+  margin: 9px 0 0;
+  overflow-wrap: anywhere;
+}
+.client-dialog-header .section-eyebrow {
+  font-size: 10px;
+}
+.client-dialog-close {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dfe6e0;
+  border-radius: 50%;
+  background: white;
+  font-size: 25px;
+  line-height: 1;
+  color: #4e6458;
+}
+.client-dialog-close:hover {
+  background: #edf5ef;
+}
+.client-dialog-body {
+  padding: 24px 28px 28px;
+}
+.client-dialog-description {
+  color: #737e77;
+  font-size: 13px;
+  line-height: 1.75;
+  margin-bottom: 22px;
+  overflow-wrap: anywhere;
+}
+.client-dialog-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid #e5ebe6;
+}
+.client-dialog-case {
+  display: block;
+  padding: 21px 0;
+  border-bottom: 1px solid #e5ebe6;
+}
+.client-dialog-case:hover h3 {
+  color: #175c45;
+}
+.client-dialog-case-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  width: 100%;
-  margin-top: auto;
-  padding-top: 0;
-}
-.client-hover-label {
-  display: none;
+  gap: 16px;
   font-size: 11px;
-  color: #5d6b62;
+  color: #42705a;
 }
-.client-cases-toggle {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  min-height: 36px;
-  padding: 4px 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #245d47;
-  font-size: 11px;
-  white-space: nowrap;
+.client-dialog-case h3 {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  margin: 10px 0;
 }
-.client-site-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  font-size: 10px;
-  color: #7a807c;
-  padding: 4px 0;
-  white-space: nowrap;
-}
-.client-site-link:hover {
-  color: #175c45;
-  text-decoration: underline;
-}
-.client-case-panel {
-  width: 100%;
-  padding: 10px 0 0;
-  margin: 0;
-  text-align: left;
-  border-top: 1px solid #e1ece5;
-}
-.client-case-panel[hidden] {
-  display: none;
-}
-.client-case-tags {
+.client-dialog-metric {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: 6px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #828b85;
 }
-.client-case-tags a {
-  display: block;
-  min-height: 36px;
-  padding: 8px 9px;
-  background: #f0f6f2;
-  color: #214e3c;
-  border-radius: 6px;
-  font-size: 10px;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+.client-dialog-metric strong {
+  color: #2a674a;
+  font-weight: 550;
 }
-.client-case-tags a:hover {
-  color: white;
-  background: #175c45;
-}
-.project-card .project-logo {
-  width: 38px;
-  min-height: 42px;
-  height: 42px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font-size: 29px;
-  font-weight: 300;
-  color: #668774;
-}
-.project-invite {
+.client-dialog-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  min-height: 36px;
-  font-size: 10px;
-  color: #668774;
-  margin-top: auto;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
 }
-@media (hover: hover) and (pointer: fine) and (min-width: 769px) {
-  .linked-client .client-cases-toggle {
-    display: none;
+.client-dialog-footer > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  font-size: 12px;
+  color: #407157;
+}
+.client-dialog-footer > a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.client-dialog-empty {
+  padding: 24px 0;
+  color: #79867d;
+  font-size: 14px;
+}
+@media (max-width: 520px) {
+  .client-dialog {
+    width: calc(100% - 20px);
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 18px;
   }
-  .client-hover-label {
-    display: inline;
+  .client-dialog-header {
+    padding: 20px;
   }
-  .client-case-panel {
-    position: absolute;
-    top: calc(100% - 1px);
-    left: -1px;
-    width: calc(100% + 2px);
-    padding: 10px;
-    margin: 0;
-    background: white;
-    border: 1px solid #6aa28a;
-    border-top: 0;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 12px 20px #183f2410;
+  .client-dialog-body {
+    padding: 20px;
   }
-  .linked-client.client-expanded {
-    border-radius: 12px 12px 0 0;
+  .client-dialog-case h3 {
+    font-size: 15px;
   }
 }
 

@@ -590,34 +590,65 @@ for (const currency of ["USD", "RUB", "KZT"]) {
     ),
   );
 }
-// Only touch mode accepts toggle clicks; desktop pointer interaction has no click toggle.
-let hoverMode = true,
-  expandedValue = false;
-state.window.matchMedia = () => ({ matches: hoverMode });
-state.le.useState = (initial) => [
-  initial,
-  (next) => {
-    expandedValue = typeof next === "function" ? next(expandedValue) : next;
-  },
-];
-const compactCard = vm.runInContext(
+// Client descriptions remain visible; related cases open only after activation.
+let modalOpen = false,
+  cardHook = 0;
+state.Pi = Symbol.for("react.fragment");
+state.le.useRef = (initial) => ({ current: initial });
+state.le.useEffect = () => {};
+state.le.useState = () =>
+  ++cardHook === 1
+    ? [false, () => {}]
+    : [
+        modalOpen,
+        (next) => {
+          modalOpen = next;
+        },
+      ];
+const clientCard = vm.runInContext(
   'ClientCard({client:window.CLIENTS.find(item=>item.id==="kilc")})',
   behavior,
 );
-const actions = compactCard.props.children.find(
-  (item) => item?.props?.className === "client-card-actions",
+const clientArticle = clientCard.props.children[0];
+assert.equal(clientArticle.props.onMouseEnter, undefined);
+assert.equal(clientArticle.props.onFocus, undefined);
+assert.equal(clientCard.props.children[1], null);
+assert.equal(
+  clientArticle.props.children.find((item) => item?.type === "p").props
+    .children,
+  state.window.CLIENTS.find((item) => item.id === "kilc").description.ru,
 );
-const toggle = actions.props.children.find((item) => item?.type === "button");
-toggle.props.onClick();
-assert.equal(expandedValue, false);
-compactCard.props.onMouseEnter();
-assert.equal(expandedValue, true);
-hoverMode = false;
-expandedValue = false;
-compactCard.props.onMouseEnter();
-assert.equal(expandedValue, false);
-toggle.props.onClick();
-assert.equal(expandedValue, true);
+clientArticle.props.children
+  .find((item) => item?.type === "button")
+  .props.onClick();
+assert.equal(modalOpen, true);
+cardHook = 0;
+const popup = vm.runInContext(
+  'ClientCard({client:window.CLIENTS.find(item=>item.id==="kilc")})',
+  behavior,
+).props.children[1];
+const dialog = popup.type(popup.props);
+const dialogBody = dialog.props.children[1];
+const relatedCases = dialogBody.props.children[1].props.children;
+assert.equal(relatedCases.length, 3);
+assert(
+  relatedCases.every((item) =>
+    item.props.href.startsWith("cases.html?lang=ru#/cases/kilc-"),
+  ),
+);
+const clientWebsite = dialogBody.props.children[2].props.children[0].props.href;
+assert.equal(
+  new URL(clientWebsite).searchParams.get("utm_content"),
+  "client-kilc",
+);
+let cancelPrevented = false;
+dialog.props.onCancel({
+  preventDefault: () => {
+    cancelPrevented = true;
+  },
+});
+assert(cancelPrevented);
+assert.equal(modalOpen, false);
 console.log(
-  "Checked searchable price tables, currency-aware filters and sorting, and separate desktop/touch interactions.",
+  "Checked searchable price tables, currency-aware filters and sorting, and client descriptions with related case dialogs.",
 );

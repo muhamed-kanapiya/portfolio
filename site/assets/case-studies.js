@@ -1,4 +1,157 @@
 /* Connections and case visualizations. Charts use supplied endpoints, never invented history. */
+function ClientCasesDialog({ client, returnFocusRef, onClose }) {
+  const dialogRef = le.useRef(null);
+  const backdropPress = le.useRef(false);
+  const records = casesForClient(client.id);
+  const href = validClientUrl(client.url);
+  const headingId = "client-dialog-title-" + client.id;
+  const description =
+    typeof client.description === "string"
+      ? client.description
+      : client.description?.[currentLanguage] || client.description?.ru || "";
+  le.useEffect(() => {
+    const dialog = dialogRef.current;
+    const trigger = returnFocusRef?.current || document.activeElement;
+    const overflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    const closeOnNavigation = () => onClose();
+    window.addEventListener("hashchange", closeOnNavigation);
+    return () => {
+      window.removeEventListener("hashchange", closeOnNavigation);
+      if (dialog.open) dialog.close();
+      document.body.style.overflow = overflow;
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+    };
+  }, [client.id]);
+  const outside = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    );
+  };
+  return i("dialog", {
+    ref: dialogRef,
+    className: "client-dialog",
+    "aria-labelledby": headingId,
+    onCancel: (event) => {
+      event.preventDefault();
+      onClose();
+    },
+    onPointerDown: (event) => {
+      backdropPress.current =
+        event.target === event.currentTarget && outside(event);
+    },
+    onClick: (event) => {
+      if (
+        backdropPress.current &&
+        event.target === event.currentTarget &&
+        outside(event)
+      )
+        onClose();
+    },
+    children: [
+      i("div", {
+        className: "client-dialog-header",
+        children: [
+          i("div", {
+            children: [
+              i("span", {
+                className: "section-eyebrow",
+                children: "CLIENT PROJECTS",
+              }),
+              i("h2", { id: headingId, children: client.name }),
+            ],
+          }),
+          i("button", {
+            type: "button",
+            className: "client-dialog-close",
+            autoFocus: true,
+            "aria-label": translateText("Close client projects"),
+            onClick: onClose,
+            children: "×",
+          }),
+        ],
+      }),
+      i("div", {
+        className: "client-dialog-body",
+        children: [
+          description
+            ? i("p", {
+                className: "client-dialog-description",
+                children: description,
+              })
+            : null,
+          records.length
+            ? i("div", {
+                className: "client-dialog-list",
+                children: records.map((record) => {
+                  const metric = record.metrics[0];
+                  return i(
+                    "a",
+                    {
+                      className: "client-dialog-case",
+                      href: detailLink("case", record.id),
+                      onClick: onClose,
+                      children: [
+                        i("div", {
+                          className: "client-dialog-case-top",
+                          children: [
+                            i("span", { children: caseCategoryLabel(record) }),
+                            i("span", { "aria-hidden": true, children: "↗" }),
+                          ],
+                        }),
+                        i("h3", { children: record.headline || record.title }),
+                        metric
+                          ? i("div", {
+                              className: "client-dialog-metric",
+                              children: [
+                                i("span", { children: metric.metric + ":" }),
+                                i("span", { children: metric.before || "—" }),
+                                i("span", {
+                                  "aria-hidden": true,
+                                  children: "→",
+                                }),
+                                i("strong", { children: metric.after || "—" }),
+                              ],
+                            })
+                          : null,
+                      ],
+                    },
+                    record.id,
+                  );
+                }),
+              })
+            : i("p", {
+                className: "client-dialog-empty",
+                children: "Case studies for this client are coming soon.",
+              }),
+          i("div", {
+            className: "client-dialog-footer",
+            children: [
+              href
+                ? i("a", {
+                    href,
+                    target: "_blank",
+                    "data-outbound": "client-" + client.id,
+                    children: "Visit client website ↗",
+                  })
+                : null,
+              i("a", {
+                href: inquiryLink(records[0]?.serviceIds?.[0]),
+                onClick: onClose,
+                children: "Discuss a similar project",
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
 function casesForClient(clientId) {
   return publishedCases().filter((record) => record.clientId === clientId);
 }
@@ -498,6 +651,11 @@ function CaseStudyPage({ record }) {
   });
 }
 Object.assign(window.RU, {
+  "CLIENT PROJECTS": "ПРОЕКТЫ КЛИЕНТА",
+  "Open client projects": "Открыть проекты клиента",
+  "Close client projects": "Закрыть проекты клиента",
+  "Case studies for this client are coming soon.":
+    "Кейсы этого клиента скоро появятся.",
   "Cases & services": "Кейсы и услуги",
   "Client website": "Сайт клиента",
   "Website ↗": "Сайт ↗",
