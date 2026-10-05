@@ -1,5 +1,7 @@
 {
   "id": "unique-project-slug",
+  "clientId": "client-id-from-clients-js",
+  "serviceIds": ["google-ads"],
   "published": false,
   "featured": true,
   "category": "ads",

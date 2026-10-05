@@ -68,6 +68,24 @@ function contactLink(subject = "") {
   return pageLink("index.html") + "#contact";
 }
 
+// Keep the destination, existing query values and hash; only add attribution.
+function outboundUrl(value, content) {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value)) return value;
+  try {
+    const url = new URL(value);
+    if (url.origin === location.origin) return value;
+    const utm = window.PORTFOLIO.outboundUtm || {};
+    url.searchParams.set("utm_source", utm.source || "ads_by_kanapiya");
+    url.searchParams.set("utm_medium", utm.medium || "referral");
+    url.searchParams.set("utm_campaign", utm.campaign || "portfolio");
+    if (content || !url.searchParams.has("utm_content"))
+      url.searchParams.set("utm_content", content || "website-link");
+    return url.href;
+  } catch {
+    return value;
+  }
+}
+
 function localizedElement(type, props, key) {
   const next = { ...props };
   if (type !== "style" && type !== "script")
@@ -103,8 +121,10 @@ function localizedElement(type, props, key) {
       type = "span";
       delete next.target;
       next.className = (next.className || "") + " unavailable-contact";
-    } else if (next.href.startsWith("https://"))
+    } else if (/^https?:\/\//i.test(next.href)) {
+      next.href = outboundUrl(next.href, next["data-outbound"]);
       next.rel = "noopener noreferrer";
+    }
   }
   return hs(type, next, key);
 }
@@ -157,6 +177,9 @@ function validClientUrl(value) {
 
 function ClientCard({ client }) {
   const [broken, setBroken] = le.useState(false);
+  const [expanded, setExpanded] = le.useState(false);
+  const records = casesForClient(client.id);
+  const panelId = "client-cases-" + client.id;
   const href = validClientUrl(client.url);
   const initials = client.name
     .split(/[\s.-]+/)
@@ -169,10 +192,33 @@ function ClientCard({ client }) {
       ? client.description
       : client.description?.[currentLanguage] || client.description?.ru || "";
   return i(
-    href ? "a" : "article",
+    "article",
     {
-      className: "client-card",
-      ...(href ? { href, target: "_blank", rel: "noopener noreferrer" } : {}),
+      id: "client-" + client.id,
+      className:
+        "client-card linked-client" + (expanded ? " client-expanded" : ""),
+      onMouseEnter: () => {
+        if (
+          window.matchMedia(
+            "(hover: hover) and (pointer: fine) and (min-width: 769px)",
+          ).matches
+        )
+          setExpanded(true);
+      },
+      onMouseLeave: (event) => {
+        if (!event.currentTarget.contains(document.activeElement))
+          setExpanded(false);
+      },
+      onKeyDown: (event) => {
+        if (event.key === "Escape") {
+          setExpanded(false);
+          event.currentTarget.querySelector(".client-cases-toggle")?.focus();
+        }
+      },
+      onBlur: (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setExpanded(false);
+      },
       children: [
         i("div", {
           className:
@@ -197,6 +243,68 @@ function ClientCard({ client }) {
         }),
         i("h3", { children: client.name }),
         i("p", { children: text }),
+        i("div", {
+          className: "client-card-actions",
+          children: [
+            records.length
+              ? i("button", {
+                  type: "button",
+                  className: "client-cases-toggle",
+                  "aria-expanded": expanded,
+                  "aria-controls": panelId,
+                  onClick: () => setExpanded((value) => !value),
+                  children: [
+                    i("span", { children: "Cases & services" }),
+                    i("span", {
+                      "aria-hidden": true,
+                      children: expanded ? "−" : "+",
+                    }),
+                  ],
+                })
+              : null,
+            href
+              ? i("a", {
+                  href,
+                  target: "_blank",
+                  className: "client-site-link",
+                  "data-outbound": "client-" + client.id,
+                  "aria-label":
+                    translateText("Client website") + ": " + client.name,
+                  children: "Website ↗",
+                })
+              : null,
+          ],
+        }),
+        records.length
+          ? i("div", {
+              id: panelId,
+              className: "client-case-panel",
+              hidden: !expanded,
+              children: [
+                i("span", {
+                  className: "client-panel-label",
+                  children: "Explore the work",
+                }),
+                i("div", {
+                  className: "client-case-tags",
+                  children: records.map((record) =>
+                    i(
+                      "a",
+                      {
+                        href: detailLink("case", record.id),
+                        "aria-label":
+                          caseCategoryLabel(record) +
+                          " — " +
+                          translateText(record.title),
+                        children: [caseCategoryLabel(record), " ↗"],
+                      },
+                      record.id,
+                    ),
+                  ),
+                }),
+              ],
+            })
+          : null,
       ],
     },
     client.id || client.name,

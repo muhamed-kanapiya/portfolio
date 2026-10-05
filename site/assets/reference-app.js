@@ -1960,18 +1960,18 @@ function Ni() {
                   "mx-auto max-w-[1280px] px-6 py-6 md:py-7 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 divide-zinc-800 md:divide-x",
                 children: [
                   {
-                    k: String(tu.length),
+                    k: portfolioCount(tu.length),
                     v: "Services with pages",
                     sub: "Tables + FAQ + KPIs",
                   },
                   {
-                    k: String(window.CLIENTS.length),
+                    k: portfolioCount(window.CLIENTS.length),
                     v: "Clients",
                     sub: "Projects & partnerships",
                   },
                   {
                     k: publishedCases().length
-                      ? String(publishedCases().length)
+                      ? portfolioCount(publishedCases().length)
                       : "SEO + Ads",
                     v: publishedCases().length ? "Case studies" : "Attract",
                     sub: publishedCases().length

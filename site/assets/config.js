@@ -11,4 +11,9 @@ window.PORTFOLIO = {
   featuredClientsLimit: 9, // 9 clients + your project = two rows of five on desktop
   showDemoCases: false, // true shows example cases; false hides them and their direct links
   currency: "USD",
+  outboundUtm: {
+    source: "ads_by_kanapiya",
+    medium: "referral",
+    campaign: "portfolio",
+  },
 };

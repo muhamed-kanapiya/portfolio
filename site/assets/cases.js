@@ -4,6 +4,8 @@
 window.REAL_CASES = [
   {
     "id": "passimpay-ads",
+    "clientId": "passimpay",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": true,
     "category": "ads",
@@ -59,6 +61,8 @@ window.REAL_CASES = [
   },
   {
     "id": "kilc-ads",
+    "clientId": "kilc",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -114,6 +118,8 @@ window.REAL_CASES = [
   },
   {
     "id": "kilc-seo",
+    "clientId": "kilc",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -169,6 +175,8 @@ window.REAL_CASES = [
   },
   {
     "id": "kilc-web",
+    "clientId": "kilc",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -224,6 +232,8 @@ window.REAL_CASES = [
   },
   {
     "id": "va-collision-ads",
+    "clientId": "va-collision",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -279,6 +289,8 @@ window.REAL_CASES = [
   },
   {
     "id": "smart-and-fast-ads",
+    "clientId": "smart-fast-appliance",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": true,
     "category": "ads",
@@ -334,6 +346,8 @@ window.REAL_CASES = [
   },
   {
     "id": "topanga-pet-resort-ads",
+    "clientId": "topanga-pet-resort",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -389,6 +403,8 @@ window.REAL_CASES = [
   },
   {
     "id": "temple-spirit-body-ads",
+    "clientId": "temple-spirit-body",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -444,6 +460,8 @@ window.REAL_CASES = [
   },
   {
     "id": "mazerooms-ads",
+    "clientId": "maze-rooms",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": true,
     "category": "ads",
@@ -499,6 +517,8 @@ window.REAL_CASES = [
   },
   {
     "id": "avrsmart-web",
+    "clientId": "avrsmart",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -554,6 +574,8 @@ window.REAL_CASES = [
   },
   {
     "id": "bailyq-web",
+    "clientId": "bailyq",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -609,6 +631,8 @@ window.REAL_CASES = [
   },
   {
     "id": "bizhelppro-web",
+    "clientId": "bizhelppro",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -664,6 +688,8 @@ window.REAL_CASES = [
   },
   {
     "id": "bright-web",
+    "clientId": "bright-edu",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -719,6 +745,8 @@ window.REAL_CASES = [
   },
   {
     "id": "bright-seo",
+    "clientId": "bright-edu",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -774,6 +802,8 @@ window.REAL_CASES = [
   },
   {
     "id": "cloudtek-ads",
+    "clientId": "cloudtek",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -829,6 +859,8 @@ window.REAL_CASES = [
   },
   {
     "id": "computerr-web",
+    "clientId": "computerr",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -884,6 +916,8 @@ window.REAL_CASES = [
   },
   {
     "id": "computerr-seo",
+    "clientId": "computerr",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -939,6 +973,8 @@ window.REAL_CASES = [
   },
   {
     "id": "cyberguard-ads",
+    "clientId": "cyberguard",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -994,6 +1030,8 @@ window.REAL_CASES = [
   },
   {
     "id": "frozenrocks-seo",
+    "clientId": "frozenrocks",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1049,6 +1087,8 @@ window.REAL_CASES = [
   },
   {
     "id": "hilaser-ads",
+    "clientId": "hilaser",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1104,6 +1144,8 @@ window.REAL_CASES = [
   },
   {
     "id": "ltc-seo",
+    "clientId": "ltc",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1159,6 +1201,8 @@ window.REAL_CASES = [
   },
   {
     "id": "ltc-ads",
+    "clientId": "ltc",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1214,6 +1258,8 @@ window.REAL_CASES = [
   },
   {
     "id": "mir-sporta-seo",
+    "clientId": "mir-sporta",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": true,
     "category": "seo",
@@ -1269,6 +1315,8 @@ window.REAL_CASES = [
   },
   {
     "id": "mir-sporta-ads",
+    "clientId": "mir-sporta",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": true,
     "category": "ads",
@@ -1324,6 +1372,8 @@ window.REAL_CASES = [
   },
   {
     "id": "oceaniqvillas-ads",
+    "clientId": "oceaniq-villas",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1379,6 +1429,8 @@ window.REAL_CASES = [
   },
   {
     "id": "ohub-web",
+    "clientId": "ohub",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -1434,6 +1486,8 @@ window.REAL_CASES = [
   },
   {
     "id": "ohub-seo",
+    "clientId": "ohub",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1489,6 +1543,8 @@ window.REAL_CASES = [
   },
   {
     "id": "olympic-seo",
+    "clientId": "olympic",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1544,6 +1600,8 @@ window.REAL_CASES = [
   },
   {
     "id": "mssp-ads",
+    "clientId": "mssp",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1599,6 +1657,8 @@ window.REAL_CASES = [
   },
   {
     "id": "qlt-ads",
+    "clientId": "qlt",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1654,6 +1714,8 @@ window.REAL_CASES = [
   },
   {
     "id": "probilim-ads",
+    "clientId": "probilim",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": false,
     "category": "ads",
@@ -1709,6 +1771,8 @@ window.REAL_CASES = [
   },
   {
     "id": "probilim-seo",
+    "clientId": "probilim",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1764,6 +1828,8 @@ window.REAL_CASES = [
   },
   {
     "id": "probilim-web",
+    "clientId": "probilim",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -1819,6 +1885,8 @@ window.REAL_CASES = [
   },
   {
     "id": "slanet-web",
+    "clientId": "slanet",
+    "serviceIds": ["web-development"],
     "published": true,
     "featured": false,
     "category": "web",
@@ -1874,6 +1942,8 @@ window.REAL_CASES = [
   },
   {
     "id": "zanconsultant-seo",
+    "clientId": "zanconsultant",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",
@@ -1929,6 +1999,8 @@ window.REAL_CASES = [
   },
   {
     "id": "panama-seo",
+    "clientId": "panama",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": true,
     "category": "seo",
@@ -1984,6 +2056,8 @@ window.REAL_CASES = [
   },
   {
     "id": "panama-ads",
+    "clientId": "panama",
+    "serviceIds": ["google-ads"],
     "published": true,
     "featured": true,
     "category": "ads",
@@ -2039,6 +2113,8 @@ window.REAL_CASES = [
   },
   {
     "id": "youtube-da-seo",
+    "clientId": "youtube-da",
+    "serviceIds": ["seo"],
     "published": true,
     "featured": false,
     "category": "seo",

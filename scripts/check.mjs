@@ -140,6 +140,10 @@ vm.runInContext(
   behavior,
 );
 vm.runInContext(
+  await readFile(path.join(site, "assets/case-studies.js"), "utf8"),
+  behavior,
+);
+vm.runInContext(
   await readFile(path.join(site, "assets/extensions.js"), "utf8"),
   behavior,
 );
@@ -417,9 +421,104 @@ const directLinks = floating.props.children
   .filter((item) => item.type === "a")
   .map((item) => item.props.href);
 assert.deepEqual(
-  [...directLinks],
+  [...directLinks].map((value) => {
+    const url = new URL(value);
+    return url.origin + url.pathname;
+  }),
   ["https://wa.me/77073406888", "https://t.me/muhamed_kanapiya"],
 );
 console.log(
   "Checked independent manual prices, emoji, hidden demo routes, real cases and drafts, and direct messenger links.",
+);
+
+// Every published client case must resolve to the correct client and services.
+const realCaseIds = new Set();
+for (const record of state.window.REAL_CASES) {
+  assert(!realCaseIds.has(record.id), `Duplicate real case id: ${record.id}`);
+  realCaseIds.add(record.id);
+  if (!record.published) continue;
+  assert(
+    ids.has(record.clientId),
+    `Unknown client in case ${record.id}: ${record.clientId}`,
+  );
+  assert(record.serviceIds?.length, `No linked services in ${record.id}`);
+  state.caseUnderTest = record;
+  assert.equal(
+    vm.runInContext("caseServices(caseUnderTest).length", behavior),
+    record.serviceIds.length,
+  );
+  assert(
+    vm.runInContext(
+      "casesForClient(caseUnderTest.clientId).some(item => item.id === caseUnderTest.id)",
+      behavior,
+    ),
+  );
+  assert.equal(
+    vm.runInContext("visibleCase(caseUnderTest.id).clientId", behavior),
+    record.clientId,
+  );
+}
+assert.equal(
+  vm.runInContext('casesForClient("missing-client").length', behavior),
+  0,
+);
+assert.equal(vm.runInContext('metricRange("$12-18").min', behavior), 12);
+assert.equal(vm.runInContext('metricRange("$12-18").max', behavior), 18);
+assert.equal(vm.runInContext('metricRange("0,8–1,5%").max', behavior), 1.5);
+assert.equal(vm.runInContext('metricRange("0").max', behavior), 0);
+for (const value of ["No data", "12-3", "-6", "2023-2024 project", "1.2.3"]) {
+  state.badMetric = value;
+  assert.equal(vm.runInContext("metricRange(badMetric)", behavior), null);
+}
+assert.equal(
+  vm.runInContext(
+    'MetricComparison({metric:{before:"$1",after:"2%"}})',
+    behavior,
+  ),
+  null,
+);
+assert.equal(vm.runInContext("portfolioCount(38)", behavior), "35+");
+assert.equal(vm.runInContext("portfolioCount(28)", behavior), "25+");
+assert.equal(vm.runInContext("portfolioCount(25)", behavior), "25+");
+state.location.origin = "https://muhamed-kanapiya.github.io";
+for (const value of [
+  "clients.html?lang=ru#client-kilc",
+  "#contact",
+  "mailto:owner@example.com",
+  "tel:+77000000000",
+  "https://muhamed-kanapiya.github.io/portfolio/clients.html",
+]) {
+  state.linkUnderTest = value;
+  assert.equal(vm.runInContext("outboundUrl(linkUnderTest)", behavior), value);
+}
+const attributed = new URL(
+  vm.runInContext(
+    'outboundUrl("https://example.com/path?ref=partner#details", "case-kilc-seo")',
+    behavior,
+  ),
+);
+assert.equal(attributed.searchParams.get("utm_source"), "ads_by_kanapiya");
+assert.equal(attributed.searchParams.get("utm_content"), "case-kilc-seo");
+assert.equal(attributed.searchParams.get("ref"), "partner");
+assert.equal(attributed.hash, "#details");
+state.attributedLink = attributed.href;
+assert.equal(
+  vm.runInContext("outboundUrl(attributedLink)", behavior),
+  attributed.href,
+);
+for (const href of directLinks) {
+  const url = new URL(href);
+  assert.equal(url.searchParams.get("utm_campaign"), "portfolio");
+  assert(url.searchParams.get("utm_content").startsWith("floating-"));
+}
+for (const channel of ["whatsapp", "telegram"]) {
+  state.testChannel = channel;
+  const url = new URL(
+    vm.runInContext('messengerLink(testChannel, "Тест + & # ?")', behavior),
+  );
+  assert.equal(url.searchParams.get("text"), "Тест + & # ?");
+  assert.equal(url.searchParams.get("utm_content"), "contact-form-" + channel);
+}
+console.log(
+  "Checked client/case/service relationships, numeric ranges, rounded counts and outbound UTM attribution.",
 );

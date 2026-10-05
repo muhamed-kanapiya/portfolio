@@ -122,6 +122,7 @@ function FloatingContacts() {
           {
             className: "floating-chat floating-" + channel,
             href,
+            "data-outbound": "floating-" + channel,
             target: "_blank",
             rel: "noopener noreferrer",
             "aria-label": translateText(label),

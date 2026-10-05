@@ -64,8 +64,11 @@ function detailLink(kind, id) {
 function catalogSummary() {
   const count = publishedCases().length;
   return currentLanguage === "ru"
-    ? `${tu.length} УСЛУГ • ${window.CLIENTS.length} КЛИЕНТОВ${count ? " • " + count + " КЕЙСОВ" : ""}`
-    : `${tu.length} SERVICES • ${window.CLIENTS.length} CLIENTS${count ? " • " + count + " CASES" : ""}`;
+    ? `${portfolioCount(tu.length)} УСЛУГ • ${portfolioCount(window.CLIENTS.length)} КЛИЕНТОВ${count ? " • " + portfolioCount(count) + " КЕЙСОВ" : ""}`
+    : `${portfolioCount(tu.length)} SERVICES • ${portfolioCount(window.CLIENTS.length)} CLIENTS${count ? " • " + portfolioCount(count) + " CASES" : ""}`;
+}
+function portfolioCount(count) {
+  return count < 5 ? String(count) : Math.floor(count / 5) * 5 + "+";
 }
 function Action({ href, children, secondary = false, ...props }) {
   return i("a", {
@@ -714,141 +717,7 @@ function ServiceDetail({ service }) {
 }
 function CaseDetail({ record }) {
   if (!record) return i(CasesEmpty, { standalone: true });
-  return i("article", {
-    className: "case-detail",
-    children: [
-      i("section", {
-        className: "case-detail-hero",
-        children: i("div", {
-          className: "page-container",
-          children: [
-            i("a", {
-              className: "back-link",
-              href: pageLink("cases.html"),
-              children: "Back to cases",
-            }),
-            i("div", { className: "section-eyebrow", children: record.tag }),
-            i("h1", { children: record.title }),
-            i("p", { className: "detail-lead", children: record.headline }),
-            record.demo
-              ? i("div", {
-                  className: "demo-notice",
-                  children: [
-                    i("strong", { children: "Demonstration case" }),
-                    i("p", {
-                      children:
-                        "These numbers illustrate a scenario. They are not verified results for a named client.",
-                    }),
-                  ],
-                })
-              : null,
-            i(Action, { href: inquiryLink(), children: "Discuss the task" }),
-          ],
-        }),
-      }),
-      i("div", {
-        className: "page-container case-detail-body",
-        children: [
-          i("section", {
-            className: "detail-metrics case-detail-metrics",
-            "aria-label": translateText(
-              record.demo ? "Illustrative metrics" : "Results",
-            ),
-            children: record.metrics.map((metric) =>
-              i(
-                "div",
-                {
-                  children: [
-                    i("span", { children: metric.metric }),
-                    i("strong", { children: metric.after }),
-                    i("small", {
-                      children:
-                        translateText("Before") +
-                        ": " +
-                        translateText(metric.before),
-                    }),
-                    i("b", { children: metric.delta }),
-                  ],
-                },
-                metric.metric,
-              ),
-            ),
-          }),
-          i("div", {
-            className: "case-work-grid",
-            children: [
-              i("section", {
-                className: "detail-panel",
-                children: [
-                  i("h2", { children: "Starting point" }),
-                  i("ul", {
-                    className: "body-list",
-                    children: record.wrong.map((text) =>
-                      i("li", { children: text }, text),
-                    ),
-                  }),
-                ],
-              }),
-              i("section", {
-                className: "detail-panel",
-                children: [
-                  i("h2", { children: "What was changed" }),
-                  i("ol", {
-                    className: "body-list numbered",
-                    children: record.did.map((text) =>
-                      i("li", { children: text }, text),
-                    ),
-                  }),
-                ],
-              }),
-            ],
-          }),
-          i("section", {
-            className: "detail-panel",
-            children: [
-              i("h2", { children: "Timeline" }),
-              i("ol", {
-                className: "case-timeline",
-                children: record.timeline.map((text, index) =>
-                  i(
-                    "li",
-                    {
-                      children: [
-                        i("span", {
-                          className: "step-number",
-                          children: String(index + 1).padStart(2, "0"),
-                        }),
-                        i("p", { children: text }),
-                      ],
-                    },
-                    text,
-                  ),
-                ),
-              }),
-            ],
-          }),
-          i("div", {
-            className: "section-heading related-heading",
-            children: [
-              i("h2", { children: "Browse other cases" }),
-              i(Action, {
-                href: pageLink("cases.html"),
-                secondary: true,
-                children: "All case studies",
-              }),
-            ],
-          }),
-          i("div", {
-            className: "case-grid",
-            children: publishedCases()
-              .filter((item) => item.id !== record.id)
-              .slice(0, 3)
-              .map((item) => i(CaseCard, { record: item }, item.id)),
-          }),
-        ],
-      }),
-    ],
-  });
+  return i(CaseStudyPage, { record });
 }
 
 const PLAN_DEFINITIONS = [
@@ -1019,22 +888,19 @@ function composeInquiry(
   return lines.join("\n");
 }
 function messengerLink(channel, message) {
-  if (channel === "whatsapp")
-    return (
-      "https://wa.me/" +
-      window.PORTFOLIO.whatsapp.replace(/\D/g, "") +
-      "?text=" +
-      encodeURIComponent(message)
-    );
-  if (channel === "telegram")
-    return (
-      "https://t.me/" +
-      window.PORTFOLIO.telegram.replace(/^@/, "") +
-      "?text=" +
-      encodeURIComponent(message)
-    );
-  throw new Error("Unknown messenger");
+  const recipient =
+    channel === "whatsapp"
+      ? "https://wa.me/" + window.PORTFOLIO.whatsapp.replace(/\D/g, "")
+      : channel === "telegram"
+        ? "https://t.me/" + window.PORTFOLIO.telegram.replace(/^@/, "")
+        : null;
+  if (!recipient) throw new Error("Unknown messenger");
+  return outboundUrl(
+    recipient + "?text=" + encodeURIComponent(message),
+    "contact-form-" + channel,
+  );
 }
+
 function InquiryForm() {
   const params = new URLSearchParams(location.search);
   const [values, setValues] = le.useState({
@@ -1240,6 +1106,7 @@ function SiteFooter() {
                 children: [
                   i("a", {
                     href: "https://wa.me/" + window.PORTFOLIO.whatsapp,
+                    "data-outbound": "footer-whatsapp",
                     target: "_blank",
                     rel: "noopener noreferrer",
                     children: [
@@ -1249,6 +1116,7 @@ function SiteFooter() {
                   }),
                   i("a", {
                     href: "https://t.me/" + window.PORTFOLIO.telegram,
+                    "data-outbound": "footer-telegram",
                     target: "_blank",
                     rel: "noopener noreferrer",
                     children: [
