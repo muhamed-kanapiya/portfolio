@@ -1,0 +1,13 @@
+{
+  "name": "google-ads-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bilingual Russian/English portfolio, ready for GitHub Pages",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
