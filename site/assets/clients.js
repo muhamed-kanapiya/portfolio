@@ -8,7 +8,7 @@ window.CLIENTS = [
     logo: "assets/logos/passimpay.svg",
     color: "#175c45",
     description: {
-      ru: "Клиент Ads by Kanapiya",
+      ru: "Криптопроцессинг PassimPay предоставляет платежные услуги для бизнеса.",
       en: "Ads by Kanapiya client",
     },
     logoDark: false,
@@ -21,7 +21,7 @@ window.CLIENTS = [
     logo: "assets/logos/kilc.png",
     color: "#334d85",
     description: {
-      ru: "Клиент Ads by Kanapiya",
+      ru: "Казахстанский Международный Лингвистический колледж KILC",
       en: "Ads by Kanapiya client",
     },
     logoDark: false,
@@ -29,12 +29,12 @@ window.CLIENTS = [
   {
     id: "va-collision",
     name: "VA Collision",
-    url: "",
+    url: "https://vacollisionrepair.com/",
     featured: true,
     logo: "",
     color: "#6b4378",
     description: {
-      ru: "Клиент Ads by Kanapiya",
+      ru: "VA Collision Monterey Park is a family owned Auto Body Shop located in Monterey Park, CA.",
       en: "Ads by Kanapiya client",
     },
   },
