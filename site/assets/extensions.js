@@ -13,22 +13,38 @@ function setCurrency(currency) {
   } catch {}
   window.dispatchEvent(new Event("currencychange"));
 }
-function money(amount, currency = currentCurrency) {
-  const rate = window.PORTFOLIO.exchange[currency] || 1;
-  const value = Math.round(Number(amount) * rate);
-  const number = new Intl.NumberFormat(
-    currentLanguage === "ru" ? "ru-RU" : "en-US",
-    { maximumFractionDigits: 0 },
-  ).format(value);
+function money(prices, currency = currentCurrency, language = currentLanguage) {
+  const value = prices?.[currency];
+  if (typeof value !== "number" || !Number.isFinite(value))
+    return language === "ru" ? "По запросу" : "By agreement";
+  const number = new Intl.NumberFormat(language === "ru" ? "ru-RU" : "en-US", {
+    maximumFractionDigits: 2,
+  }).format(value);
   return currency === "USD"
     ? "$" + number
     : number + (currency === "RUB" ? " ₽" : " ₸");
 }
-function priceText(value) {
-  const match = /^\$(\d+(?:\.\d+)?)(.*)$/.exec(value || "");
-  return match
-    ? money(Number(match[1])) + (match[2] ? " " + match[2] : "")
-    : translateText(value || "By agreement");
+function servicePrices(serviceId, packageName) {
+  return window.PRICES.services[serviceId]?.[packageName];
+}
+function priceText(prices) {
+  const amount = money(prices);
+  return typeof prices?.[currentCurrency] === "number" && prices.suffix
+    ? amount + " " + prices.suffix
+    : amount;
+}
+function planPeriod(plan, language = currentLanguage) {
+  if (!plan.monthly) return language === "ru" ? "Разово" : "One-time";
+  const percent = window.PRICES.plans[plan.id]?.adSpendPercent;
+  return (
+    (language === "ru" ? "В месяц" : "Per month") +
+    (percent
+      ? " + " +
+        percent +
+        "% " +
+        (language === "ru" ? "от рекламного бюджета" : "of ad spend")
+      : "")
+  );
 }
 function inquiryLink(service = "", plan = "") {
   const params = new URLSearchParams({ lang: currentLanguage });
@@ -46,9 +62,10 @@ function detailLink(kind, id) {
   );
 }
 function catalogSummary() {
+  const count = publishedCases().length;
   return currentLanguage === "ru"
-    ? `${tu.length} УСЛУГ • ${Nn.length} КЕЙСОВ • ${window.CLIENTS.length} КЛИЕНТОВ`
-    : `${tu.length} SERVICES • ${Nn.length} CASES • ${window.CLIENTS.length} CLIENTS`;
+    ? `${tu.length} УСЛУГ • ${window.CLIENTS.length} КЛИЕНТОВ${count ? " • " + count + " КЕЙСОВ" : ""}`
+    : `${tu.length} SERVICES • ${window.CLIENTS.length} CLIENTS${count ? " • " + count + " CASES" : ""}`;
 }
 function Action({ href, children, secondary = false, ...props }) {
   return i("a", {
@@ -90,7 +107,9 @@ function SiteHeader() {
   const route = readRoute().page;
   const links = [
     ["Services", "services.html", ["service", "services-index"]],
-    ["Case studies", "cases.html", ["case", "cases-index"]],
+    ...(publishedCases().length
+      ? [["Case studies", "cases.html", ["case", "cases-index"]]]
+      : []),
     ["Clients", "clients.html", ["clients"]],
     ["Process", "index.html#process", []],
     ["Pricing", "index.html#pricing", []],
@@ -165,7 +184,7 @@ function SiteHeader() {
   });
 }
 function ServiceCard({ service }) {
-  const fee = service.pricing?.[1]?.price;
+  const fee = servicePrices(service.id, service.pricing?.[1]?.pkg);
   return i(
     "a",
     {
@@ -263,7 +282,7 @@ function ServicesSection() {
   });
 }
 function CaseCard({ record }) {
-  const main = record.metrics[0];
+  const main = record.metrics[0] || {};
   return i(
     "a",
     {
@@ -274,10 +293,17 @@ function CaseCard({ record }) {
           className: "case-card-top",
           children: [
             i("span", { className: "case-tag", children: record.tag }),
-            i("span", { className: "case-result", children: main.delta }),
+            main.delta
+              ? i("span", { className: "case-result", children: main.delta })
+              : null,
           ],
         }),
-        i("span", { className: "demo-label", children: "Demonstration case" }),
+        record.demo
+          ? i("span", {
+              className: "demo-label",
+              children: "Demonstration case",
+            })
+          : null,
         i("h3", { children: record.title }),
         i("p", { children: record.headline }),
         i("div", {
@@ -309,14 +335,12 @@ function CaseCard({ record }) {
   );
 }
 function CasesSection() {
+  const records = publishedCases();
+  if (!records.length) return null;
   const selected = [
-    "ecom-us",
-    "seo-catalog",
-    "wordpress-performance",
-    "english-school",
-    "ga4-measurement",
-    "python-reporting",
-  ].map((id) => Nn.find((item) => item.id === id));
+    ...records.filter((item) => item.featured),
+    ...records.filter((item) => !item.featured),
+  ].slice(0, 6);
   return i("section", {
     id: "cases",
     className: "catalog-section cases-home",
@@ -340,15 +364,20 @@ function CasesSection() {
             i(Action, {
               href: pageLink("cases.html"),
               secondary: true,
-              children: translateText("All case studies") + " · " + Nn.length,
+              children:
+                translateText("All case studies") +
+                " · " +
+                publishedCases().length,
             }),
           ],
         }),
-        i("p", {
-          className: "section-note",
-          children:
-            "These numbers illustrate a scenario. They are not verified results for a named client.",
-        }),
+        records.some((item) => item.demo)
+          ? i("p", {
+              className: "section-note",
+              children:
+                "These numbers illustrate a scenario. They are not verified results for a named client.",
+            })
+          : null,
         i("div", {
           className: "case-grid",
           children: selected.map((record) =>
@@ -362,7 +391,7 @@ function CasesSection() {
 function ArchivePage({ kind }) {
   const [filter, setFilter] = le.useState("all");
   const services = kind === "services";
-  const records = services ? tu : Nn;
+  const records = services ? tu : publishedCases();
   const categories = window.SERVICE_CATEGORIES.filter(
     ([key]) => key === "all" || records.some((item) => item.category === key),
   );
@@ -393,7 +422,9 @@ function ArchivePage({ kind }) {
           i("p", {
             children: services
               ? "Choose the right solution for your task."
-              : "These numbers illustrate a scenario. They are not verified results for a named client.",
+              : records.some((item) => item.demo)
+                ? "These numbers illustrate a scenario. They are not verified results for a named client."
+                : "Project goals, completed work and results.",
           }),
           i("div", {
             className: "archive-toolbar",
@@ -426,16 +457,19 @@ function ArchivePage({ kind }) {
         "aria-label": translateText(
           services ? "Service catalog" : "Case study archive",
         ),
-        children: i("div", {
-          className: services ? "service-grid" : "case-grid",
-          children: filtered.map((item) =>
-            i(
-              services ? ServiceCard : CaseCard,
-              services ? { service: item } : { record: item },
-              item.id,
-            ),
-          ),
-        }),
+        children:
+          !services && !records.length
+            ? i(CasesEmpty, {})
+            : i("div", {
+                className: services ? "service-grid" : "case-grid",
+                children: filtered.map((item) =>
+                  i(
+                    services ? ServiceCard : CaseCard,
+                    services ? { service: item } : { record: item },
+                    item.id,
+                  ),
+                ),
+              }),
       }),
     ],
   });
@@ -545,7 +579,9 @@ function ServiceDetail({ service }) {
                                   i("td", { children: item.timeline }),
                                   i("td", {
                                     className: "fee-cell",
-                                    children: priceText(item.price),
+                                    children: priceText(
+                                      servicePrices(service.id, item.pkg),
+                                    ),
                                   }),
                                   i("td", { children: item.bestFor }),
                                 ],
@@ -564,7 +600,7 @@ function ServiceDetail({ service }) {
                   }),
                 ],
               }),
-              service.kpis
+              service.kpis && window.PORTFOLIO.showDemoCases
                 ? i("section", {
                     className: "detail-panel",
                     children: [
@@ -677,6 +713,7 @@ function ServiceDetail({ service }) {
   });
 }
 function CaseDetail({ record }) {
+  if (!record) return i(CasesEmpty, { standalone: true });
   return i("article", {
     className: "case-detail",
     children: [
@@ -693,16 +730,18 @@ function CaseDetail({ record }) {
             i("div", { className: "section-eyebrow", children: record.tag }),
             i("h1", { children: record.title }),
             i("p", { className: "detail-lead", children: record.headline }),
-            i("div", {
-              className: "demo-notice",
-              children: [
-                i("strong", { children: "Demonstration case" }),
-                i("p", {
-                  children:
-                    "These numbers illustrate a scenario. They are not verified results for a named client.",
-                }),
-              ],
-            }),
+            record.demo
+              ? i("div", {
+                  className: "demo-notice",
+                  children: [
+                    i("strong", { children: "Demonstration case" }),
+                    i("p", {
+                      children:
+                        "These numbers illustrate a scenario. They are not verified results for a named client.",
+                    }),
+                  ],
+                })
+              : null,
             i(Action, { href: inquiryLink(), children: "Discuss the task" }),
           ],
         }),
@@ -712,7 +751,9 @@ function CaseDetail({ record }) {
         children: [
           i("section", {
             className: "detail-metrics case-detail-metrics",
-            "aria-label": translateText("Illustrative metrics"),
+            "aria-label": translateText(
+              record.demo ? "Illustrative metrics" : "Results",
+            ),
             children: record.metrics.map((metric) =>
               i(
                 "div",
@@ -799,7 +840,8 @@ function CaseDetail({ record }) {
           }),
           i("div", {
             className: "case-grid",
-            children: Nn.filter((item) => item.id !== record.id)
+            children: publishedCases()
+              .filter((item) => item.id !== record.id)
               .slice(0, 3)
               .map((item) => i(CaseCard, { record: item }, item.id)),
           }),
@@ -813,7 +855,6 @@ const PLAN_DEFINITIONS = [
   {
     id: "audit",
     name: "Audit",
-    price: 49,
     service: "audit",
     intro: "Find the main growth opportunities",
     features: [
@@ -826,7 +867,6 @@ const PLAN_DEFINITIONS = [
   {
     id: "launch",
     name: "Launch",
-    price: 350,
     service: "google-ads",
     intro: "Build a measurable advertising setup",
     features: [
@@ -840,7 +880,6 @@ const PLAN_DEFINITIONS = [
   {
     id: "management",
     name: "Management",
-    price: 250,
     service: "google-ads",
     intro: "Improve campaigns on an ongoing basis",
     features: [
@@ -894,17 +933,11 @@ function PricingSection() {
                   i("p", { className: "plan-intro", children: plan.intro }),
                   i("div", {
                     className: "plan-price",
-                    children: money(plan.price),
+                    children: money(window.PRICES.plans[plan.id]),
                   }),
                   i("p", {
                     className: "plan-period",
-                    children: plan.monthly
-                      ? translateText("Per month") +
-                        " + 10% " +
-                        (currentLanguage === "ru"
-                          ? "от рекламного бюджета"
-                          : "of ad spend")
-                      : translateText("One-time"),
+                    children: planPeriod(plan),
                   }),
                   i("ul", {
                     className: "plan-features",
@@ -949,20 +982,7 @@ function PricingSection() {
         }),
         i("p", {
           className: "small-note currency-note",
-          children: [
-            translateText(
-              "Prices in RUB and KZT are indicative, based on the saved NBK rate dated",
-            ) + " ",
-            i("a", {
-              href: window.PORTFOLIO.exchange.source,
-              target: "_blank",
-              rel: "noopener noreferrer",
-              children: window.PORTFOLIO.exchange.date
-                .split("-")
-                .reverse()
-                .join("."),
-            }),
-          ],
+          children: "Prices are set separately for each currency.",
         }),
       ],
     }),
@@ -988,7 +1008,7 @@ function composeInquiry(
     lines.push(`${ru ? "Сайт" : "Website"}: ${values.website.trim()}`);
   if (plan)
     lines.push(
-      `${ru ? "Тариф" : "Plan"}: ${translate(plan.name)} · ${money(plan.price, currency)}${plan.monthly ? " + 10%" : ""}`,
+      `${ru ? "Тариф" : "Plan"}: ${translate(plan.name)} · ${money(window.PRICES.plans[plan.id], currency, language)} · ${planPeriod(plan, language)}`,
     );
   lines.push(
     `${ru ? "Валюта" : "Currency"}: ${currency}`,
@@ -1262,10 +1282,12 @@ function SiteFooter() {
             "aria-label": translateText("Menu"),
             children: [
               i("a", { href: pageLink("services.html"), children: "Services" }),
-              i("a", {
-                href: pageLink("cases.html"),
-                children: "Case studies",
-              }),
+              publishedCases().length
+                ? i("a", {
+                    href: pageLink("cases.html"),
+                    children: "Case studies",
+                  })
+                : null,
               i("a", { href: pageLink("clients.html"), children: "Clients" }),
             ],
           }),

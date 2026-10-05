@@ -8,13 +8,7 @@ window.PORTFOLIO = {
   linkedin: "",
   contra: "",
   upwork: "",
-  featuredClientsLimit: 4,
+  featuredClientsLimit: 9, // 9 clients + your project = two rows of five on desktop
+  showDemoCases: false, // true shows example cases; false hides them and their direct links
   currency: "USD",
-  exchange: {
-    USD: 1,
-    KZT: 447.73,
-    RUB: 83.6878504673,
-    date: "2026-10-05",
-    source: "https://nationalbank.kz/rss/get_rates.cfm?fdate=05.10.2026",
-  },
 };

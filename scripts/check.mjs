@@ -27,7 +27,12 @@ for (const page of [
   }
 }
 const context = vm.createContext({ window: {} });
-for (const file of ["config.js", "clients.js", "translations.js"]) {
+for (const file of [
+  "config.js",
+  "prices.js",
+  "clients.js",
+  "translations.js",
+]) {
   vm.runInContext(
     await readFile(path.join(site, "assets", file), "utf8"),
     context,
@@ -56,6 +61,7 @@ const state = {
     PORTFOLIO: context.window.PORTFOLIO,
     RU: context.window.RU,
     CLIENTS: [],
+    PRICES: context.window.PRICES,
   },
   location: { search: "", pathname: "/portfolio/index.html", hash: "" },
   localStorage: { getItem: () => null },
@@ -80,10 +86,10 @@ assert.equal(vm.runInContext("readRoute().caseId", behavior), "ecom-us");
 state.location.hash = "";
 state.location.pathname = "/portfolio/clients.html";
 assert.equal(vm.runInContext("readRoute().page", behavior), "clients");
-state.window.CLIENTS = Array.from({ length: 8 }, (_, index) => ({
+state.window.CLIENTS = Array.from({ length: 12 }, (_, index) => ({
   id: "test-" + index,
   name: "Test " + index,
-  featured: index < 6,
+  featured: index < 11,
   description: { ru: "Тест", en: "Test" },
 }));
 const featured = vm
@@ -91,15 +97,15 @@ const featured = vm
   .props.children[2].props.children.filter(Boolean);
 assert.equal(
   featured.length,
-  5,
-  "Four featured clients plus the project invitation",
+  10,
+  "Nine featured clients plus the project invitation",
 );
 const all = vm.runInContext("ClientsPage()", behavior).props.children[1].props
   .children[0].props.children;
 assert.equal(
   all.length,
-  9,
-  "The full list must contain all eight test clients",
+  13,
+  "The full list must contain all twelve test clients",
 );
 assert.equal(
   vm.runInContext('translateText("All clients")', behavior),
@@ -118,7 +124,7 @@ console.log(
   "Checked Russian default, both languages, subpath routes, featured limit and full client list.",
 );
 
-// Catalog navigation, all currency conversions and messenger drafts.
+// Catalog navigation, independently entered prices and messenger drafts.
 Object.assign(state, { Intl });
 state.window.CLIENTS = context.window.CLIENTS;
 vm.runInContext(
@@ -130,10 +136,14 @@ vm.runInContext(
   behavior,
 );
 vm.runInContext(
+  await readFile(path.join(site, "assets/cases.js"), "utf8"),
+  behavior,
+);
+vm.runInContext(
   await readFile(path.join(site, "assets/extensions.js"), "utf8"),
   behavior,
 );
-assert.equal(state.window.CLIENTS.length, 28);
+
 assert.equal(vm.runInContext("tu.length", behavior), 25);
 assert.equal(vm.runInContext("Nn.length", behavior), 14);
 assert.equal(
@@ -170,7 +180,10 @@ for (const language of ["ru", "en"]) {
   vm.runInContext(`currentLanguage='${language}'`, behavior);
   for (const currency of ["USD", "RUB", "KZT"]) {
     vm.runInContext(`currentCurrency='${currency}'`, behavior);
-    const number = vm.runInContext("money(350)", behavior);
+    const number = vm.runInContext(
+      "money(window.PRICES.plans.launch)",
+      behavior,
+    );
     assert(
       number.includes(
         currency === "USD" ? "$" : currency === "RUB" ? "₽" : "₸",
@@ -178,9 +191,16 @@ for (const language of ["ru", "en"]) {
     );
     assert.equal(
       Number(number.replace(/[^0-9]/g, "")),
-      Math.round(350 * state.window.PORTFOLIO.exchange[currency]),
+      state.window.PRICES.plans.launch[currency],
     );
-    assert(vm.runInContext('priceText("$250+10%")', behavior).endsWith("+10%"));
+    assert(
+      vm
+        .runInContext(
+          'priceText(servicePrices("search-ads", "Management"))',
+          behavior,
+        )
+        .endsWith("+10%"),
+    );
     state.formValues = {
       name: " Тест & Example ",
       contact: " +7 700 000 00 00 ",
@@ -224,7 +244,7 @@ for (const language of ["ru", "en"]) {
   }
 }
 console.log(
-  "Checked 25 services, 14 demo cases, 28 clients, archive routes, USD/RUB/KZT and both messenger drafts in RU/EN.",
+  "Checked 25 services, 14 demo cases, 28 clients, archive routes, independent USD/RUB/KZT prices and both messenger drafts in RU/EN.",
 );
 
 // Exercise the actual submit handler without opening or sending anything externally.
@@ -290,4 +310,116 @@ assert(
 );
 console.log(
   "Checked actual form submit handlers, correct recipients, validation and vendor namespace isolation.",
+);
+
+// Manual prices must not depend on another currency or an exchange-rate field.
+for (const service of vm.runInContext("tu", behavior)) {
+  for (const row of service.pricing) {
+    const prices = state.window.PRICES.services[service.id]?.[row.pkg];
+    assert(prices, `Missing price entry: ${service.id} / ${row.pkg}`);
+    for (const currency of ["USD", "RUB", "KZT"]) {
+      assert(
+        prices[currency] === null ||
+          (Number.isFinite(prices[currency]) && prices[currency] >= 0),
+        `Invalid manual price: ${service.id} / ${row.pkg} / ${currency}`,
+      );
+    }
+  }
+}
+const launchPrices = state.window.PRICES.plans.launch;
+const previousUSD = launchPrices.USD;
+const expectedRUB = vm.runInContext(
+  'money(window.PRICES.plans.launch,"RUB")',
+  behavior,
+);
+launchPrices.USD = 9999;
+assert.equal(
+  vm.runInContext('money(window.PRICES.plans.launch,"RUB")', behavior),
+  expectedRUB,
+);
+launchPrices.USD = previousUSD;
+assert.equal(
+  vm.runInContext('money({USD:123,RUB:null,KZT:0},"RUB","ru")', behavior),
+  "По запросу",
+);
+assert.equal(
+  vm.runInContext('money({USD:123,RUB:null,KZT:0},"KZT","ru")', behavior),
+  "0 ₸",
+);
+assert.equal(
+  vm.runInContext('money(undefined,"USD","en")', behavior),
+  "By agreement",
+);
+assert(
+  vm.runInContext(
+    "tu.filter(item=>item.extra).every(item=>/\\p{Extended_Pictographic}/u.test(item.emoji))",
+    behavior,
+  ),
+);
+
+vm.runInContext(
+  await readFile(path.join(site, "assets/enhancements.js"), "utf8"),
+  behavior,
+);
+const originalRealCases = state.window.REAL_CASES;
+const originalDemoVisibility = state.window.PORTFOLIO.showDemoCases;
+state.window.REAL_CASES = [
+  {
+    id: "test-real-case",
+    published: true,
+    category: "seo",
+    title: { ru: "Реальный тестовый кейс", en: "Real test case" },
+    metrics: [{ metric: "Leads", before: "1", after: "2", delta: "+1" }],
+  },
+  {
+    id: "test-draft",
+    published: false,
+    title: { ru: "Черновик", en: "Draft" },
+  },
+];
+state.window.PORTFOLIO.showDemoCases = false;
+assert.equal(vm.runInContext("publishedCases().length", behavior), 1);
+assert.equal(vm.runInContext('visibleCase("ecom-us")', behavior), undefined);
+assert.equal(vm.runInContext('visibleCase("test-draft")', behavior), undefined);
+assert.equal(
+  vm.runInContext('visibleCase("test-real-case").demo', behavior),
+  false,
+);
+assert.equal(
+  vm.runInContext(
+    'translateText(visibleCase("test-real-case").title)',
+    behavior,
+  ),
+  "Реальный тестовый кейс",
+);
+assert.equal(
+  vm.runInContext(
+    'CaseDetail({record:visibleCase("ecom-us")}).type.name',
+    behavior,
+  ),
+  "CasesEmpty",
+);
+const realCard = vm.runInContext(
+  'CaseCard({record:visibleCase("test-real-case")})',
+  behavior,
+);
+assert(
+  !realCard.props.children.some(
+    (item) => item?.props?.className === "demo-label",
+  ),
+);
+state.window.PORTFOLIO.showDemoCases = true;
+assert.equal(vm.runInContext("publishedCases().length", behavior), 15);
+state.window.REAL_CASES = originalRealCases;
+state.window.PORTFOLIO.showDemoCases = originalDemoVisibility;
+const floating = vm.runInContext("FloatingContacts()", behavior);
+const directLinks = floating.props.children
+  .filter((item) => item.type === "a")
+  .map((item) => item.props.href);
+assert.deepEqual(
+  [...directLinks],
+  ["https://wa.me/77073406888", "https://t.me/muhamed_kanapiya"],
+);
+console.log(
+  "Checked independent manual prices, emoji, hidden demo routes, real cases and drafts, and direct messenger links.",
 );

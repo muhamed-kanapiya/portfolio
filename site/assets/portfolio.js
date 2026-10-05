@@ -226,7 +226,7 @@ function ProjectCard() {
 function ClientsSection() {
   const clients = window.CLIENTS.filter((client) => client.featured).slice(
     0,
-    window.PORTFOLIO.featuredClientsLimit || 4,
+    window.PORTFOLIO.featuredClientsLimit || 9,
   );
   return i("section", {
     id: "clients",
@@ -364,20 +364,21 @@ function PortfolioRoot() {
       const route = readRoute();
       let title = translateText("Google Ads, SEO and web development");
       if (route.page === "clients") title = translateText("All clients");
-      if (route.page === "services-index") title = translateText("All services");
-      if (route.page === "cases-index") title = translateText("All case studies");
+      if (route.page === "services-index")
+        title = translateText("All services");
+      if (route.page === "cases-index")
+        title = translateText("All case studies");
       if (route.page === "service")
         title = translateText(
           tu.find((item) => item.id === route.service)?.title || "Services",
         );
       if (route.page === "case")
-        title = translateText(
-          Nn.find((item) => item.id === route.caseId)?.title || "Cases",
-        );
+        title = translateText(visibleCase(route.caseId)?.title || "Cases");
       document.title = title + " — " + window.PORTFOLIO.name;
-      document.querySelector('meta[name="description"]').content = translateText(
-        "Google Ads, SEO, GA4 / GTM and web development. Services, case studies and clients.",
-      );
+      document.querySelector('meta[name="description"]').content =
+        translateText(
+          "Google Ads, SEO, GA4 / GTM and web development. Services, case studies and clients.",
+        );
     };
     updateMetadata();
     window.addEventListener("hashchange", updateMetadata);
@@ -394,7 +395,11 @@ function ContactAction() {
   return i(available ? "a" : "p", {
     className: available ? "contact-action" : "contact-pending",
     ...(available
-      ? { href: window.PORTFOLIO.calendly || contactLink(translateText("New project")) }
+      ? {
+          href:
+            window.PORTFOLIO.calendly ||
+            contactLink(translateText("New project")),
+        }
       : {}),
     children: available
       ? "Discuss your project"

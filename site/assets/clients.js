@@ -54,7 +54,7 @@ window.CLIENTS = [
     id: "topanga-pet-resort",
     name: "Topanga Pet Resort",
     url: "https://www.topangapetresort.com/",
-    featured: false,
+    featured: true,
     logo: "assets/logos/topanga-pet-resort.webp",
     color: "#17647c",
     description: {
@@ -79,7 +79,7 @@ window.CLIENTS = [
     id: "maze-rooms",
     name: "Maze Rooms",
     url: "https://mazerooms.com/",
-    featured: false,
+    featured: true,
     logo: "assets/logos/maze-rooms.png",
     color: "#175c45",
     description: {
@@ -92,7 +92,7 @@ window.CLIENTS = [
     id: "avrsmart",
     name: "AVR Smart",
     url: "https://avrsmart.ae",
-    featured: false,
+    featured: true,
     logo: "assets/logos/avrsmart.png",
     color: "#334d85",
     description: {
@@ -130,7 +130,7 @@ window.CLIENTS = [
     id: "bright-edu",
     name: "Bright Education",
     url: "https://bright.edu.kz",
-    featured: false,
+    featured: true,
     logo: "assets/logos/bright.svg",
     color: "#17647c",
     description: {
@@ -143,7 +143,7 @@ window.CLIENTS = [
     id: "cloudtek",
     name: "Cloudtek",
     url: "https://cloudtek.kz",
-    featured: false,
+    featured: true,
     logo: "assets/logos/cloudtek.svg",
     color: "#67552a",
     description: {

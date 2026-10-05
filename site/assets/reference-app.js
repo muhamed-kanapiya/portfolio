@@ -25,17 +25,15 @@ var tu = [
         },
       ],
       pricing: [
-        { pkg: "Audit", timeline: "24h", price: "$49", bestFor: "Quick leaks" },
+        { pkg: "Audit", timeline: "24h", bestFor: "Quick leaks" },
         {
           pkg: "Setup",
           timeline: "3 days",
-          price: "$350",
           bestFor: "Rebuild from scratch",
         },
         {
           pkg: "Management",
           timeline: "Monthly",
-          price: "$250+10%",
           bestFor: "Scale profit",
         },
       ],
@@ -115,19 +113,16 @@ var tu = [
         {
           pkg: "Fix Existing",
           timeline: "2 days",
-          price: "$250",
           bestFor: "Stuck PMax",
         },
         {
           pkg: "Full Setup",
           timeline: "4 days",
-          price: "$400",
           bestFor: "Ecom $10k+/mo",
         },
         {
           pkg: "Scale",
           timeline: "Monthly",
-          price: "$300+10%",
           bestFor: "Multi-geo",
         },
       ],
@@ -203,19 +198,16 @@ var tu = [
         {
           pkg: "Feed Fix",
           timeline: "2 days",
-          price: "$200",
           bestFor: "GMC warnings",
         },
         {
           pkg: "Shopping Rebuild",
           timeline: "3 days",
-          price: "$350",
           bestFor: "ROAS <2x",
         },
         {
           pkg: "Full Ecom",
           timeline: "5 days",
-          price: "$550",
           bestFor: "$15k+/mo",
         },
       ],
@@ -288,19 +280,16 @@ var tu = [
         {
           pkg: "Audit + Checklist",
           timeline: "24h",
-          price: "$99",
           bestFor: "Warning",
         },
         {
           pkg: "Unban Package",
           timeline: "3-7 days",
-          price: "$400",
           bestFor: "Suspended",
         },
         {
           pkg: "Full GMC Build",
           timeline: "4 days",
-          price: "$350",
           bestFor: "New store",
         },
       ],
@@ -371,19 +360,16 @@ var tu = [
         {
           pkg: "Title Rewrite (500 SKU)",
           timeline: "3 days",
-          price: "$180",
           bestFor: "CTR boost",
         },
         {
           pkg: "Full Feed System",
           timeline: "5 days",
-          price: "$400",
           bestFor: "1k-5k SKU",
         },
         {
           pkg: "Feed + PMax",
           timeline: "7 days",
-          price: "$600",
           bestFor: "Scale",
         },
       ],
@@ -453,19 +439,16 @@ var tu = [
         {
           pkg: "Remarketing Setup",
           timeline: "2 days",
-          price: "$180",
           bestFor: "Abandoned cart",
         },
         {
           pkg: "Full Display",
           timeline: "3 days",
-          price: "$300",
           bestFor: "Scale",
         },
         {
           pkg: "Prospecting + Retarget",
           timeline: "5 days",
-          price: "$450",
           bestFor: "Ecom + SaaS",
         },
       ],
@@ -532,19 +515,16 @@ var tu = [
         {
           pkg: "Creative Audit",
           timeline: "24h",
-          price: "$99",
           bestFor: "Low CTR",
         },
         {
           pkg: "YouTube Setup",
           timeline: "4 days",
-          price: "$400",
           bestFor: "Lead + App",
         },
         {
           pkg: "YT + Remarketing",
           timeline: "7 days",
-          price: "$650",
           bestFor: "Scale",
         },
       ],
@@ -608,19 +588,16 @@ var tu = [
         {
           pkg: "Setup",
           timeline: "2 days",
-          price: "$250",
           bestFor: "Ecom visual",
         },
         {
           pkg: "Setup + Creative",
           timeline: "5 days",
-          price: "$500",
           bestFor: "Need assets",
         },
         {
           pkg: "Scale Pack",
           timeline: "Monthly",
-          price: "$300+10%",
           bestFor: "App + Ecom",
         },
       ],
@@ -678,19 +655,16 @@ var tu = [
         {
           pkg: "Install Setup",
           timeline: "3 days",
-          price: "$350",
           bestFor: "New app",
         },
         {
           pkg: "tROAS Scale",
           timeline: "7 days",
-          price: "$550",
           bestFor: "IAP / Subs",
         },
         {
           pkg: "iOS + Android",
           timeline: "10 days",
-          price: "$750",
           bestFor: "Both stores",
         },
       ],
@@ -748,19 +722,16 @@ var tu = [
         {
           pkg: "Local Starter",
           timeline: "2 days",
-          price: "$200",
           bestFor: "Single location",
         },
         {
           pkg: "LSA + Local",
           timeline: "4 days",
-          price: "$350",
           bestFor: "Service biz",
         },
         {
           pkg: "Multi-location",
           timeline: "7 days",
-          price: "$600",
           bestFor: "3+ spots",
         },
       ],
@@ -819,19 +790,16 @@ var tu = [
         {
           pkg: "Call Setup",
           timeline: "1 day",
-          price: "$150",
           bestFor: "Urgent leads",
         },
         {
           pkg: "Tracking + Calls",
           timeline: "3 days",
-          price: "$300",
           bestFor: "Full stack",
         },
         {
           pkg: "Scale",
           timeline: "Monthly",
-          price: "$250+10%",
           bestFor: "High volume",
         },
       ],
@@ -892,19 +860,16 @@ var tu = [
         {
           pkg: "Loom Audit",
           timeline: "24h",
-          price: "$49",
           bestFor: "Quick wins",
         },
         {
           pkg: "Deep Audit + Sheet",
           timeline: "2 days",
-          price: "$180",
           bestFor: "Rescue plan",
         },
         {
           pkg: "Audit + Fix",
           timeline: "5 days",
-          price: "$450",
           bestFor: "Full rescue",
         },
       ],
@@ -966,19 +931,16 @@ var tu = [
         {
           pkg: "GA4 + GTM Fix",
           timeline: "1 day",
-          price: "$180",
           bestFor: "Broken tracking",
         },
         {
           pkg: "Server-Side + EC",
           timeline: "2 days",
-          price: "$350",
           bestFor: "iOS loss",
         },
         {
           pkg: "Full Stack",
           timeline: "3 days",
-          price: "$550",
           bestFor: "Offline sales",
         },
       ],
@@ -1039,19 +1001,16 @@ var tu = [
         {
           pkg: "LP Audit",
           timeline: "24h",
-          price: "$79",
           bestFor: "Quick wins",
         },
         {
           pkg: "Audit + Wireframe",
           timeline: "3 days",
-          price: "$250",
           bestFor: "Redesign brief",
         },
         {
           pkg: "CRO Sprint",
           timeline: "14 days",
-          price: "$600",
           bestFor: "A/B testing",
         },
       ],
@@ -1115,19 +1074,16 @@ var tu = [
         {
           pkg: "Intel Report",
           timeline: "1 day",
-          price: "$99",
           bestFor: "Who beats you",
         },
         {
           pkg: "Conquest Setup",
           timeline: "3 days",
-          price: "$350",
           bestFor: "Steal share",
         },
         {
           pkg: "Defense + Offense",
           timeline: "5 days",
-          price: "$550",
           bestFor: "Both sides",
         },
       ],
@@ -1566,7 +1522,7 @@ function Ni() {
         m(0));
     }, [e, n, l]));
   let w = (h) => tu.find((F) => F.id === h) || tu[0],
-    P = (h) => Nn.find((F) => F.id === h) || Nn[0],
+    P = (h) => visibleCase(h),
     N = (h) => {
       window.location.hash = "/services/" + h;
       r(h);
@@ -1612,7 +1568,8 @@ function Ni() {
     };
   return c("div", {
     className:
-      "min-h-screen bg-white text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white",
+      "min-h-screen bg-white text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white" +
+      (e === "home" ? " home-page" : ""),
     children: [
       i("style", {
         children: `
@@ -1622,12 +1579,13 @@ function Ni() {
         html { scroll-behavior: smooth; }
       `,
       }),
+      i(HomeMotion, { active: e === "home" }),
       i(SiteHeader, {}),
       e === "home" &&
         c(Pi, {
           children: [
             c("section", {
-              className: "relative overflow-hidden",
+              className: "relative overflow-hidden home-hero",
               children: [
                 c("div", {
                   className: "pointer-events-none absolute inset-0",
@@ -1702,12 +1660,19 @@ function Ni() {
                                 ],
                               }),
                               c("button", {
-                                onClick: () => O("cases"),
+                                onClick: () =>
+                                  O(
+                                    publishedCases().length
+                                      ? "cases"
+                                      : "clients",
+                                  ),
                                 className:
                                   "h-[48px] px-6 rounded-full border border-zinc-200 bg-white text-[15px] font-medium inline-flex items-center gap-2 hover:bg-zinc-50 transition",
                                 children: [
                                   i(Nr, { className: "w-4 h-4" }),
-                                  "Browse cases",
+                                  publishedCases().length
+                                    ? "Browse cases"
+                                    : "Clients",
                                 ],
                               }),
                             ],
@@ -1771,89 +1736,17 @@ function Ni() {
                           }),
                         ],
                       }),
-                      c("div", {
-                        className: "relative md:sticky md:top-[92px]",
-                        children: [
-                          c("div", {
+                      window.PORTFOLIO.showDemoCases
+                        ? c("div", {
                             className:
-                              "rounded-[28px] border border-zinc-200 bg-white shadow-[0_20px_80px_-20px_rgba(0,0,0,0.25)] overflow-hidden",
+                              "relative md:sticky md:top-[92px] hero-visual",
                             children: [
                               c("div", {
-                                className: "p-7",
+                                className:
+                                  "rounded-[28px] border border-zinc-200 bg-white shadow-[0_20px_80px_-20px_rgba(0,0,0,0.25)] overflow-hidden",
                                 children: [
                                   c("div", {
-                                    className:
-                                      "flex items-center justify-between",
-                                    children: [
-                                      i("div", {
-                                        className:
-                                          "text-[11px] tracking-widest uppercase font-semibold text-zinc-400",
-                                        children:
-                                          "Example dashboard · Demo data",
-                                      }),
-                                      c("div", {
-                                        className:
-                                          "h-6 px-2.5 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-medium text-emerald-700 inline-flex items-center gap-1",
-                                        children: [
-                                          i("span", {
-                                            className:
-                                              "h-1.5 w-1.5 rounded-full bg-emerald-500",
-                                          }),
-                                          " Demo",
-                                        ],
-                                      }),
-                                    ],
-                                  }),
-                                  c("div", {
-                                    className: "mt-6 grid grid-cols-2 gap-4",
-                                    children: [
-                                      c("div", {
-                                        className:
-                                          "rounded-2xl bg-zinc-900 text-white p-4",
-                                        children: [
-                                          i("div", {
-                                            className:
-                                              "text-[11px] uppercase tracking-widest text-zinc-400",
-                                            children: "ROAS",
-                                          }),
-                                          i("div", {
-                                            className:
-                                              "mt-2 text-[28px] font-bold tracking-tight",
-                                            children: "4.2x",
-                                          }),
-                                          i("div", {
-                                            className:
-                                              "mt-1 text-[12px] text-zinc-300",
-                                            children: "was 1.8x → +133%",
-                                          }),
-                                        ],
-                                      }),
-                                      c("div", {
-                                        className:
-                                          "rounded-2xl bg-zinc-50 border border-zinc-200 p-4",
-                                        children: [
-                                          i("div", {
-                                            className:
-                                              "text-[11px] uppercase tracking-widest text-zinc-400",
-                                            children: "CPA",
-                                          }),
-                                          i("div", {
-                                            className:
-                                              "mt-2 text-[28px] font-bold tracking-tight",
-                                            children: "$11.3",
-                                          }),
-                                          i("div", {
-                                            className:
-                                              "mt-1 text-[12px] text-emerald-600",
-                                            children: "was $42 → -73%",
-                                          }),
-                                        ],
-                                      }),
-                                    ],
-                                  }),
-                                  c("div", {
-                                    className:
-                                      "mt-4 rounded-2xl border border-zinc-200 p-4",
+                                    className: "p-7",
                                     children: [
                                       c("div", {
                                         className:
@@ -1861,50 +1754,151 @@ function Ni() {
                                         children: [
                                           i("div", {
                                             className:
-                                              "text-[13px] font-medium",
-                                            children: "Ecom US — Shopify",
+                                              "text-[11px] tracking-widest uppercase font-semibold text-zinc-400",
+                                            children:
+                                              "Example dashboard · Demo data",
                                           }),
-                                          i("div", {
+                                          c("div", {
                                             className:
-                                              "text-[11px] text-zinc-500",
-                                            children: "Search + PMax",
+                                              "h-6 px-2.5 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-medium text-emerald-700 inline-flex items-center gap-1",
+                                            children: [
+                                              i("span", {
+                                                className:
+                                                  "h-1.5 w-1.5 rounded-full bg-emerald-500",
+                                              }),
+                                              " Demo",
+                                            ],
                                           }),
                                         ],
                                       }),
-                                      i("div", {
+                                      c("div", {
                                         className:
-                                          "mt-3 h-[56px] flex items-end gap-[3px]",
+                                          "mt-6 grid grid-cols-2 gap-4",
                                         children: [
-                                          12, 18, 10, 22, 16, 28, 20, 34, 26,
-                                          40, 32, 48,
-                                        ].map((h, F) =>
-                                          i(
-                                            "div",
-                                            {
-                                              className:
-                                                "flex-1 rounded-full bg-zinc-900",
-                                              style: {
-                                                height: `${h}px`,
-                                                opacity: 0.15 + F * 0.07,
-                                              },
-                                            },
-                                            F,
-                                          ),
-                                        ),
+                                          c("div", {
+                                            className:
+                                              "rounded-2xl bg-zinc-900 text-white p-4",
+                                            children: [
+                                              i("div", {
+                                                className:
+                                                  "text-[11px] uppercase tracking-widest text-zinc-400",
+                                                children: "ROAS",
+                                              }),
+                                              i("div", {
+                                                className:
+                                                  "mt-2 text-[28px] font-bold tracking-tight",
+                                                children: "4.2x",
+                                              }),
+                                              i("div", {
+                                                className:
+                                                  "mt-1 text-[12px] text-zinc-300",
+                                                children: "was 1.8x → +133%",
+                                              }),
+                                            ],
+                                          }),
+                                          c("div", {
+                                            className:
+                                              "rounded-2xl bg-zinc-50 border border-zinc-200 p-4",
+                                            children: [
+                                              i("div", {
+                                                className:
+                                                  "text-[11px] uppercase tracking-widest text-zinc-400",
+                                                children: "CPA",
+                                              }),
+                                              i("div", {
+                                                className:
+                                                  "mt-2 text-[28px] font-bold tracking-tight",
+                                                children: "$11.3",
+                                              }),
+                                              i("div", {
+                                                className:
+                                                  "mt-1 text-[12px] text-emerald-600",
+                                                children: "was $42 → -73%",
+                                              }),
+                                            ],
+                                          }),
+                                        ],
                                       }),
                                       c("div", {
                                         className:
-                                          "mt-3 flex gap-2 text-[11px]",
+                                          "mt-4 rounded-2xl border border-zinc-200 p-4",
                                         children: [
-                                          i("span", {
+                                          c("div", {
                                             className:
-                                              "px-2 py-1 rounded-full bg-zinc-900 text-white",
-                                            children: "Merchant Center fixed",
+                                              "flex items-center justify-between",
+                                            children: [
+                                              i("div", {
+                                                className:
+                                                  "text-[13px] font-medium",
+                                                children: "Ecom US — Shopify",
+                                              }),
+                                              i("div", {
+                                                className:
+                                                  "text-[11px] text-zinc-500",
+                                                children: "Search + PMax",
+                                              }),
+                                            ],
                                           }),
-                                          i("span", {
+                                          i("div", {
                                             className:
-                                              "px-2 py-1 rounded-full border",
-                                            children: "Feed + PMax structure",
+                                              "mt-3 h-[56px] flex items-end gap-[3px]",
+                                            children: [
+                                              12, 18, 10, 22, 16, 28, 20, 34,
+                                              26, 40, 32, 48,
+                                            ].map((h, F) =>
+                                              i(
+                                                "div",
+                                                {
+                                                  className:
+                                                    "flex-1 rounded-full bg-zinc-900",
+                                                  style: {
+                                                    height: `${h}px`,
+                                                    opacity: 0.15 + F * 0.07,
+                                                  },
+                                                },
+                                                F,
+                                              ),
+                                            ),
+                                          }),
+                                          c("div", {
+                                            className:
+                                              "mt-3 flex gap-2 text-[11px]",
+                                            children: [
+                                              i("span", {
+                                                className:
+                                                  "px-2 py-1 rounded-full bg-zinc-900 text-white",
+                                                children:
+                                                  "Merchant Center fixed",
+                                              }),
+                                              i("span", {
+                                                className:
+                                                  "px-2 py-1 rounded-full border",
+                                                children:
+                                                  "Feed + PMax structure",
+                                              }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                      c("div", {
+                                        className:
+                                          "mt-4 grid grid-cols-2 gap-3 text-[12px]",
+                                        children: [
+                                          c("div", {
+                                            className:
+                                              "flex items-center gap-2",
+                                            children: [
+                                              i(Me, { className: "w-4 h-4" }),
+                                              " Enhanced Conversions",
+                                            ],
+                                          }),
+                                          c("div", {
+                                            className:
+                                              "flex items-center gap-2",
+                                            children: [
+                                              i(Me, { className: "w-4 h-4" }),
+                                              " GA4 + GTM in 1 day",
+                                            ],
                                           }),
                                         ],
                                       }),
@@ -1912,21 +1906,19 @@ function Ni() {
                                   }),
                                   c("div", {
                                     className:
-                                      "mt-4 grid grid-cols-2 gap-3 text-[12px]",
+                                      "h-[56px] bg-zinc-50 border-t border-zinc-200 flex items-center justify-between px-7",
                                     children: [
-                                      c("div", {
-                                        className: "flex items-center gap-2",
-                                        children: [
-                                          i(Me, { className: "w-4 h-4" }),
-                                          " Enhanced Conversions",
-                                        ],
+                                      i("div", {
+                                        className: "text-[12px] text-zinc-500",
+                                        children:
+                                          "Kazakhstan · GMT+5 · Working remotely",
                                       }),
-                                      c("div", {
-                                        className: "flex items-center gap-2",
-                                        children: [
-                                          i(Me, { className: "w-4 h-4" }),
-                                          " GA4 + GTM in 1 day",
-                                        ],
+                                      i("div", {
+                                        className:
+                                          "h-6 w-6 rounded-full bg-white border grid place-items-center",
+                                        children: i(me, {
+                                          className: "w-3.5 h-3.5",
+                                        }),
                                       }),
                                     ],
                                   }),
@@ -1934,47 +1926,28 @@ function Ni() {
                               }),
                               c("div", {
                                 className:
-                                  "h-[56px] bg-zinc-50 border-t border-zinc-200 flex items-center justify-between px-7",
+                                  "mt-4 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/60 p-4 flex items-center gap-3",
                                 children: [
-                                  i("div", {
-                                    className: "text-[12px] text-zinc-500",
-                                    children:
-                                      "Kazakhstan · GMT+5 · Working remotely",
-                                  }),
                                   i("div", {
                                     className:
-                                      "h-6 w-6 rounded-full bg-white border grid place-items-center",
-                                    children: i(me, {
-                                      className: "w-3.5 h-3.5",
-                                    }),
+                                      "h-9 w-9 rounded-full bg-white border grid place-items-center",
+                                    children: i(_n, { className: "w-4 h-4" }),
+                                  }),
+                                  c("div", {
+                                    className: "text-[13px]",
+                                    children: [
+                                      i("span", {
+                                        className: "font-semibold",
+                                        children: "Demonstration case",
+                                      }),
+                                      " — Click any case for full breakdown.",
+                                    ],
                                   }),
                                 ],
                               }),
                             ],
-                          }),
-                          c("div", {
-                            className:
-                              "mt-4 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/60 p-4 flex items-center gap-3",
-                            children: [
-                              i("div", {
-                                className:
-                                  "h-9 w-9 rounded-full bg-white border grid place-items-center",
-                                children: i(_n, { className: "w-4 h-4" }),
-                              }),
-                              c("div", {
-                                className: "text-[13px]",
-                                children: [
-                                  i("span", {
-                                    className: "font-semibold",
-                                    children: "Demonstration case",
-                                  }),
-                                  " — Click any case for full breakdown.",
-                                ],
-                              }),
-                            ],
-                          }),
-                        ],
-                      }),
+                          })
+                        : i(HomeOverview, {}),
                     ],
                   }),
                 }),
@@ -1997,9 +1970,13 @@ function Ni() {
                     sub: "Projects & partnerships",
                   },
                   {
-                    k: String(Nn.length),
-                    v: "Case studies",
-                    sub: "Demonstration scenarios",
+                    k: publishedCases().length
+                      ? String(publishedCases().length)
+                      : "SEO + Ads",
+                    v: publishedCases().length ? "Case studies" : "Attract",
+                    sub: publishedCases().length
+                      ? "Projects and outcomes"
+                      : "Search and advertising",
                   },
                   { k: "RU / EN", v: "Two languages", sub: "Working remotely" },
                 ].map((h) =>
@@ -2165,6 +2142,7 @@ function Ni() {
       e === "service" && i(ServiceDetail, { service: w(n) }),
       e === "case" && i(CaseDetail, { record: P(l) }),
       i(SiteFooter, {}),
+      i(FloatingContacts, {}),
     ],
   });
 }

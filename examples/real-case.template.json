@@ -1,0 +1,26 @@
+{
+  "id": "unique-project-slug",
+  "published": false,
+  "featured": true,
+  "category": "ads",
+  "title": { "ru": "Название реального проекта", "en": "Real project title" },
+  "headline": {
+    "ru": "Кратко: задача и подтверждённый результат",
+    "en": "Briefly: the task and verified outcome"
+  },
+  "tag": {
+    "ru": "Ниша · Страна · Период",
+    "en": "Industry · Country · Period"
+  },
+  "metrics": [
+    {
+      "metric": { "ru": "Название показателя", "en": "Metric name" },
+      "before": "",
+      "after": "",
+      "delta": ""
+    }
+  ],
+  "wrong": [{ "ru": "Исходная ситуация", "en": "Starting point" }],
+  "did": [{ "ru": "Что именно было сделано", "en": "What was delivered" }],
+  "timeline": [{ "ru": "Этап и срок", "en": "Stage and timeframe" }]
+}

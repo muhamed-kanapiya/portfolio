@@ -43,7 +43,6 @@ function extraService(
       {
         pkg: catalogTranslation("Assessment", "Оценка задачи"),
         timeline: catalogTranslation("1–2 working days", "1–2 рабочих дня"),
-        price: catalogTranslation("By agreement", "По запросу"),
         bestFor: catalogTranslation(
           "A clear scope and estimate",
           "Состав работ и оценка",
@@ -52,13 +51,11 @@ function extraService(
       {
         pkg: catalogTranslation("Implementation", "Реализация"),
         timeline,
-        price: catalogTranslation("By agreement", "По запросу"),
         bestFor: short,
       },
       {
         pkg: catalogTranslation("Ongoing support", "Поддержка"),
         timeline: catalogTranslation("As needed", "По необходимости"),
-        price: catalogTranslation("By agreement", "По запросу"),
         bestFor: catalogTranslation(
           "Updates and improvements",
           "Развитие и улучшения",
@@ -125,7 +122,7 @@ tu.push(
   extraService(
     "google-ads",
     "ads",
-    "G",
+    "🎯",
     catalogTranslation("Google Ads — end to end", "Google Ads — под ключ"),
     catalogTranslation(
       "One strategy from the first click to the sale",
@@ -185,7 +182,7 @@ tu.push(
   extraService(
     "seo",
     "seo",
-    "S",
+    "🔎",
     "SEO",
     catalogTranslation(
       "A website search engines and people understand",
@@ -245,7 +242,7 @@ tu.push(
   extraService(
     "web-development",
     "web",
-    "W",
+    "🌐",
     catalogTranslation("Web development", "Веб-разработка"),
     catalogTranslation(
       "A website built around your business task",
@@ -308,7 +305,7 @@ tu.push(
   extraService(
     "website-repair",
     "web",
-    "↻",
+    "🛠️",
     catalogTranslation(
       "Website fixes and improvement",
       "Исправление и доработка сайтов",
@@ -371,7 +368,7 @@ tu.push(
   extraService(
     "wordpress",
     "web",
-    "WP",
+    "📰",
     "WordPress",
     catalogTranslation(
       "A manageable website without unnecessary plugins",
@@ -428,7 +425,7 @@ tu.push(
   extraService(
     "tilda",
     "web",
-    "T",
+    "🎨",
     "Tilda",
     catalogTranslation(
       "A clear landing page that is easy to update",
@@ -485,7 +482,7 @@ tu.push(
   extraService(
     "react",
     "web",
-    "R",
+    "⚛️",
     "React",
     catalogTranslation(
       "Interactive interfaces with predictable behavior",
@@ -542,7 +539,7 @@ tu.push(
   extraService(
     "html-css-js",
     "web",
-    "</>",
+    "💻",
     "HTML / CSS / JavaScript",
     catalogTranslation(
       "Lightweight pages and precise frontend fixes",
@@ -599,7 +596,7 @@ tu.push(
   extraService(
     "python",
     "automation",
-    "Py",
+    "🐍",
     "Python",
     catalogTranslation(
       "Automate repetitive work with data",
@@ -659,7 +656,7 @@ tu.push(
   extraService(
     "aeo-geo-ai",
     "research",
-    "AI",
+    "✨",
     catalogTranslation("AEO / GEO & AI pilots", "AEO / GEO и пилоты с ИИ"),
     catalogTranslation(
       "Explore new search and useful AI workflows",
@@ -1399,3 +1396,33 @@ Object.assign(window.RU, {
 });
 
 window.RU["Account review and priorities"] = "Аудит и приоритеты";
+
+Object.assign(window.RU, {
+  "Prices are set separately for each currency.":
+    "Для каждой валюты установлены отдельные цены.",
+  "Project goals, completed work and results.":
+    "Задачи проектов, выполненные работы и результаты.",
+  "Real stories are on the way.": "Готовлю подробные разборы проектов.",
+  "Explore the client list or tell me about your task.":
+    "Пока посмотрите список клиентов или расскажите о своей задаче.",
+  "This case is not published.": "Этот кейс пока не опубликован.",
+  Results: "Результаты",
+  "Write directly": "Написать напрямую",
+  "Write on WhatsApp": "Написать в WhatsApp",
+  "Write on Telegram": "Написать в Telegram",
+  "Open WhatsApp chat": "Открыть чат WhatsApp",
+  "Open Telegram chat": "Открыть чат Telegram",
+  "From the first click to the inquiry.": "От первого клика до заявки.",
+  "One connected workflow": "Единая система",
+  Attract: "Привлечь",
+  Engage: "Заинтересовать",
+  Measure: "Измерить",
+  Improve: "Улучшить",
+  "Advertising and search": "Реклама и поиск",
+  "Website and landing pages": "Сайт и посадочные страницы",
+  "Events and conversions": "События и конверсии",
+  "Testing and optimization": "Тесты и оптимизация",
+  "Built around your business": "Вокруг задач вашего бизнеса",
+  "Search and advertising": "Поиск и реклама",
+  "Projects and outcomes": "Проекты и результаты",
+});
