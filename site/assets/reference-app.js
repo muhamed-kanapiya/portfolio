@@ -2137,6 +2137,7 @@ function Ni() {
           ],
         }),
       e === "clients" && i(ClientsPage, {}),
+      e === "pricing" && i(PricingPage, {}),
       e === "services-index" && i(ArchivePage, { kind: "services" }),
       e === "cases-index" && i(ArchivePage, { kind: "cases" }),
       e === "service" && i(ServiceDetail, { service: w(n) }),

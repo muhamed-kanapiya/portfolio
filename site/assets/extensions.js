@@ -115,7 +115,7 @@ function SiteHeader() {
       : []),
     ["Clients", "clients.html", ["clients"]],
     ["Process", "index.html#process", []],
-    ["Pricing", "index.html#pricing", []],
+    ["Pricing", "pricing.html", ["pricing"]],
   ];
   const hrefFor = (file) => {
     const [page, anchor] = file.split("#");
@@ -853,6 +853,11 @@ function PricingSection() {
           className: "small-note currency-note",
           children: "Prices are set separately for each currency.",
         }),
+        i(Action, {
+          href: pageLink("pricing.html"),
+          secondary: true,
+          children: "View the full price list ↗",
+        }),
       ],
     }),
   });
@@ -1157,6 +1162,7 @@ function SiteFooter() {
                   })
                 : null,
               i("a", { href: pageLink("clients.html"), children: "Clients" }),
+              i("a", { href: pageLink("pricing.html"), children: "Pricing" }),
             ],
           }),
           i("span", { children: "Google Ads · SEO · Web · Analytics" }),

@@ -15,6 +15,7 @@ for (const page of [
   "clients.html",
   "services.html",
   "cases.html",
+  "pricing.html",
 ]) {
   const html = await readFile(path.join(site, page), "utf8");
   assert(
@@ -52,7 +53,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, four HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, five HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -175,6 +176,7 @@ for (const [filename, expected] of [
   ["cases.html", "cases-index"],
   ["clients.html", "clients"],
   ["index.html", "home"],
+  ["pricing.html", "pricing"],
 ]) {
   state.location.pathname = "/portfolio/" + filename;
   state.location.hash = "";
@@ -521,4 +523,101 @@ for (const channel of ["whatsapp", "telegram"]) {
 }
 console.log(
   "Checked client/case/service relationships, numeric ranges, rounded counts and outbound UTM attribution.",
+);
+
+vm.runInContext(
+  await readFile(path.join(site, "assets/pricing-page.js"), "utf8"),
+  behavior,
+);
+vm.runInContext('currentLanguage="ru"; currentCurrency="USD"', behavior);
+assert.equal(
+  vm.runInContext("priceCatalogRows().length", behavior),
+  vm.runInContext("tu.reduce((sum,item)=>sum+item.pricing.length,0)", behavior),
+);
+assert.equal(
+  vm.runInContext('filteredPriceRows({query:"WordPress"}).length', behavior),
+  3,
+);
+assert.equal(
+  vm.runInContext(
+    'filteredPriceRows({query:"несуществующаяуслуга"}).length',
+    behavior,
+  ),
+  0,
+);
+assert(
+  vm.runInContext(
+    'filteredPriceRows({category:"web"}).every(row=>row.service.category==="web")',
+    behavior,
+  ),
+);
+assert(
+  vm.runInContext(
+    'filteredPriceRows({query:"поисковая аудит"}).some(row=>row.service.id==="search-ads" && row.pkg.pkg==="Audit")',
+    behavior,
+  ),
+);
+for (const currency of ["USD", "RUB", "KZT"]) {
+  vm.runInContext(`currentCurrency="${currency}"`, behavior);
+  assert(
+    vm.runInContext(
+      'filteredPriceRows({priceType:"fixed"}).every(row=>Number.isFinite(row.prices[currentCurrency]))',
+      behavior,
+    ),
+  );
+  assert(
+    vm.runInContext(
+      'filteredPriceRows({priceType:"request"}).every(row=>!Number.isFinite(row.prices[currentCurrency]))',
+      behavior,
+    ),
+  );
+  const ascending = vm.runInContext(
+    'filteredPriceRows({priceType:"fixed",sort:"ascending"}).map(row=>row.prices[currentCurrency])',
+    behavior,
+  );
+  assert(
+    [...ascending].every(
+      (value, index, list) => !index || value >= list[index - 1],
+    ),
+  );
+  const descending = vm.runInContext(
+    'filteredPriceRows({priceType:"fixed",sort:"descending"}).map(row=>row.prices[currentCurrency])',
+    behavior,
+  );
+  assert(
+    [...descending].every(
+      (value, index, list) => !index || value <= list[index - 1],
+    ),
+  );
+}
+// Only touch mode accepts toggle clicks; desktop pointer interaction has no click toggle.
+let hoverMode = true,
+  expandedValue = false;
+state.window.matchMedia = () => ({ matches: hoverMode });
+state.le.useState = (initial) => [
+  initial,
+  (next) => {
+    expandedValue = typeof next === "function" ? next(expandedValue) : next;
+  },
+];
+const compactCard = vm.runInContext(
+  'ClientCard({client:window.CLIENTS.find(item=>item.id==="kilc")})',
+  behavior,
+);
+const actions = compactCard.props.children.find(
+  (item) => item?.props?.className === "client-card-actions",
+);
+const toggle = actions.props.children.find((item) => item?.type === "button");
+toggle.props.onClick();
+assert.equal(expandedValue, false);
+compactCard.props.onMouseEnter();
+assert.equal(expandedValue, true);
+hoverMode = false;
+expandedValue = false;
+compactCard.props.onMouseEnter();
+assert.equal(expandedValue, false);
+toggle.props.onClick();
+assert.equal(expandedValue, true);
+console.log(
+  "Checked searchable price tables, currency-aware filters and sorting, and separate desktop/touch interactions.",
 );

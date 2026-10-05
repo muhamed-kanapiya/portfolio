@@ -57,7 +57,9 @@ function readRoute() {
               ? "services-index"
               : file === "cases.html"
                 ? "cases-index"
-                : "home",
+                : file === "pricing.html"
+                  ? "pricing"
+                  : "home",
     service:
       segments[0] === "services" ? segments[1] || "search-ads" : "search-ads",
     caseId: segments[0] === "cases" ? segments[1] || "ecom-us" : "ecom-us",
@@ -175,6 +177,11 @@ function validClientUrl(value) {
   }
 }
 
+function clientHoverMode() {
+  return window.matchMedia(
+    "(hover: hover) and (pointer: fine) and (min-width: 769px)",
+  ).matches;
+}
 function ClientCard({ client }) {
   const [broken, setBroken] = le.useState(false);
   const [expanded, setExpanded] = le.useState(false);
@@ -187,32 +194,32 @@ function ClientCard({ client }) {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-  const text =
-    typeof client.description === "string"
-      ? client.description
-      : client.description?.[currentLanguage] || client.description?.ru || "";
   return i(
     "article",
     {
       id: "client-" + client.id,
+      tabIndex: records.length ? 0 : undefined,
+      "aria-label": client.name,
       className:
         "client-card linked-client" + (expanded ? " client-expanded" : ""),
       onMouseEnter: () => {
-        if (
-          window.matchMedia(
-            "(hover: hover) and (pointer: fine) and (min-width: 769px)",
-          ).matches
-        )
-          setExpanded(true);
+        if (clientHoverMode()) setExpanded(true);
       },
       onMouseLeave: (event) => {
-        if (!event.currentTarget.contains(document.activeElement))
+        if (!(
+          event.currentTarget.contains(document.activeElement) &&
+          document.activeElement?.matches(":focus-visible")
+        ))
           setExpanded(false);
+      },
+      onFocus: (event) => {
+        if (clientHoverMode() && event.target.matches(":focus-visible"))
+          setExpanded(true);
       },
       onKeyDown: (event) => {
         if (event.key === "Escape") {
+          event.currentTarget.focus();
           setExpanded(false);
-          event.currentTarget.querySelector(".client-cases-toggle")?.focus();
         }
       },
       onBlur: (event) => {
@@ -242,19 +249,27 @@ function ClientCard({ client }) {
                 }),
         }),
         i("h3", { children: client.name }),
-        i("p", { children: text }),
         i("div", {
           className: "client-card-actions",
           children: [
+            records.length
+              ? i("span", {
+                  className: "client-hover-label",
+                  "aria-hidden": true,
+                  children: [translateText("Cases"), " · ", records.length],
+                })
+              : null,
             records.length
               ? i("button", {
                   type: "button",
                   className: "client-cases-toggle",
                   "aria-expanded": expanded,
                   "aria-controls": panelId,
-                  onClick: () => setExpanded((value) => !value),
+                  onClick: () => {
+                    if (!clientHoverMode()) setExpanded((value) => !value);
+                  },
                   children: [
-                    i("span", { children: "Cases & services" }),
+                    i("span", { children: "Cases" }),
                     i("span", {
                       "aria-hidden": true,
                       children: expanded ? "−" : "+",
@@ -281,10 +296,6 @@ function ClientCard({ client }) {
               className: "client-case-panel",
               hidden: !expanded,
               children: [
-                i("span", {
-                  className: "client-panel-label",
-                  children: "Explore the work",
-                }),
                 i("div", {
                   className: "client-case-tags",
                   children: records.map((record) =>
@@ -318,15 +329,11 @@ function ProjectCard() {
     children: [
       i("div", {
         className: "project-logo",
-        children: [
-          i("span", { children: "Your logo" }),
-          i("small", { children: window.PORTFOLIO.name }),
-        ],
+        "aria-hidden": true,
+        children: "+",
       }),
       i("h3", { children: "Your project" }),
-      i("p", {
-        children: "Let’s turn your advertising into your next growth story.",
-      }),
+      i("span", { className: "project-invite", children: "Discuss the task" }),
     ],
   });
 }
@@ -476,6 +483,7 @@ function PortfolioRoot() {
         title = translateText("All services");
       if (route.page === "cases-index")
         title = translateText("All case studies");
+      if (route.page === "pricing") title = translateText("Service pricing");
       if (route.page === "service")
         title = translateText(
           tu.find((item) => item.id === route.service)?.title || "Services",
