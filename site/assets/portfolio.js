@@ -41,6 +41,13 @@ function isClientsPage() {
 function readRoute() {
   const segments = location.hash.slice(1).split("/").filter(Boolean);
   const file = location.pathname.split("/").pop();
+  const blogPages = {
+    "blog.html": "blog",
+    "blog-category.html": "blog-category",
+    "blog-post.html": "blog-post",
+  };
+  if (blogPages[file])
+    return { page: blogPages[file], service: "search-ads", caseId: "ecom-us" };
   return {
     page:
       segments[0] === "services"
@@ -410,6 +417,10 @@ function PortfolioRoot() {
     document.documentElement.lang = language;
     const updateMetadata = () => {
       const route = readRoute();
+      const blogMeta =
+        route.page.startsWith("blog") && typeof blogMetadata === "function"
+          ? blogMetadata(route.page)
+          : null;
       let title = translateText("Google Ads, SEO and web development");
       if (route.page === "clients") title = translateText("All clients");
       if (route.page === "services-index")
@@ -426,9 +437,11 @@ function PortfolioRoot() {
         );
       if (route.page === "case")
         title = translateText(visibleCase(route.caseId)?.title || "Cases");
-      document.title = title + " — " + window.PORTFOLIO.name;
-      document.querySelector('meta[name="description"]').content =
-        route.page === "about"
+      document.title =
+        (blogMeta?.title || title) + " — " + window.PORTFOLIO.name;
+      document.querySelector('meta[name="description"]').content = blogMeta
+        ? blogMeta.description
+        : route.page === "about"
           ? profileCopy(window.ABOUT_PROFILE.intro)
           : route.page === "reviews"
             ? translateText(

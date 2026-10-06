@@ -18,6 +18,9 @@ for (const page of [
   "pricing.html",
   "reviews.html",
   "about.html",
+  "blog.html",
+  "blog-category.html",
+  "blog-post.html",
 ]) {
   const html = await readFile(path.join(site, page), "utf8");
   assert(
@@ -56,7 +59,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, seven HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, ten HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -831,4 +834,127 @@ for (const language of ["ru", "en"]) {
 }
 console.log(
   "Checked review drafts, source attribution, bilingual search and local case/profile images.",
+);
+
+// Editorial content must remain navigable on GitHub Pages and safe to draft.
+for (const file of ["navigation.js", "blog-data.js", "blog.js"]) {
+  vm.runInContext(
+    await readFile(path.join(site, "assets", file), "utf8"),
+    behavior,
+  );
+}
+assert(
+  vm.runInContext(
+    "MEGA_GROUPS.every(group => group.ids.every(id => tu.some(service => service.id === id && service.emoji)))",
+    behavior,
+  ),
+);
+const categorySlugs = new Set(
+  state.window.BLOG_CATEGORIES.map((item) => item.slug),
+);
+assert.equal(categorySlugs.size, state.window.BLOG_CATEGORIES.length);
+const postSlugs = new Set();
+const blockTypes = new Set([
+  "paragraph",
+  "list",
+  "table",
+  "tabs",
+  "accordion",
+  "callout",
+  "quote",
+  "code",
+]);
+function checkBlogBlocks(blocks) {
+  for (const block of blocks) {
+    assert(blockTypes.has(block.type), `Unsupported blog block: ${block.type}`);
+    if (block.type === "table")
+      assert(block.rows.every((row) => row.length === block.headers.length));
+    if (block.type === "tabs") {
+      assert.equal(
+        new Set(block.items.map((item) => item.id)).size,
+        block.items.length,
+      );
+      block.items.forEach((item) => checkBlogBlocks(item.blocks));
+    }
+  }
+}
+for (const post of state.window.BLOG_POSTS) {
+  assert(!postSlugs.has(post.slug));
+  postSlugs.add(post.slug);
+  assert(categorySlugs.has(post.category));
+  assert(post.title.ru && post.title.en && post.excerpt.ru && post.excerpt.en);
+  assert.equal(
+    new Set(post.sections.map((section) => section.id)).size,
+    post.sections.length,
+  );
+  for (const section of post.sections) {
+    assert(section.title.ru && section.title.en && section.blocks.length);
+    assert(!["comments", "main-content", "blog-top"].includes(section.id));
+    checkBlogBlocks(section.blocks);
+  }
+}
+const articleCount = vm.runInContext("publicBlogPosts().length", behavior);
+state.window.BLOG_POSTS.push({ slug: "draft-check", status: "draft" });
+assert.equal(
+  vm.runInContext("publicBlogPosts().length", behavior),
+  articleCount,
+);
+state.location.search = "?lang=ru&post=draft-check";
+assert.equal(
+  vm.runInContext('blogMetadata("blog-post").description', behavior),
+  "",
+);
+state.window.BLOG_POSTS.pop();
+for (const language of ["ru", "en"]) {
+  vm.runInContext(`currentLanguage="${language}"`, behavior);
+  state.location.search = `?lang=${language}&post=measurement-plan`;
+  for (const page of ["blog", "blog-category", "blog-post"]) {
+    state.location.pathname = `/portfolio/${page}.html`;
+    state.location.hash = "#plan";
+    assert.equal(vm.runInContext("readRoute().page", behavior), page);
+  }
+  assert.equal(
+    vm.runInContext('blogPostLink("measurement-plan")', behavior),
+    `blog-post.html?lang=${language}&post=measurement-plan`,
+  );
+  assert.equal(
+    vm.runInContext('blogCategoryLink("analytics")', behavior),
+    `blog-category.html?lang=${language}&category=analytics`,
+  );
+  assert.equal(
+    vm.runInContext('filteredBlogPosts("analytics", "UTM").length', behavior),
+    1,
+  );
+  assert.equal(
+    vm.runInContext('filteredBlogPosts("advertising", "UTM").length', behavior),
+    0,
+  );
+  assert.equal(
+    vm.runInContext(
+      'filteredBlogPosts("", "not-present-topic").length',
+      behavior,
+    ),
+    0,
+  );
+  assert.equal(
+    vm.runInContext('blogMetadata("blog-post").title', behavior),
+    state.window.BLOG_POSTS[0].title[language],
+  );
+  const related = vm.runInContext(
+    "relatedBlogPosts(window.BLOG_POSTS[0])",
+    behavior,
+  );
+  assert(related.every((item) => item.slug !== "measurement-plan"));
+  assert.equal(related[0].category, "analytics");
+}
+vm.runInContext('currentLanguage="ru"', behavior);
+assert.equal(
+  vm.runInContext(
+    'blogReadMinutes({sections:[{title:{ru:"Тест",en:"Test"},blocks:[{type:"paragraph",text:{ru:"слово ".repeat(360),en:"word"}}]}]})',
+    behavior,
+  ),
+  3,
+);
+console.log(
+  "Checked menu service links, blog block structure, drafts, bilingual search, reading time and direct subpath URLs.",
 );

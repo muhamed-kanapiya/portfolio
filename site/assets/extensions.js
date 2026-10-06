@@ -99,93 +99,7 @@ function CurrencySelector() {
 }
 
 function SiteHeader() {
-  const [open, setOpen] = le.useState(false);
-  le.useEffect(() => {
-    const close = (event) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, []);
-  const route = readRoute().page;
-  const links = [
-    ["Services", "services.html", ["service", "services-index"]],
-    ...(publishedCases().length
-      ? [["Case studies", "cases.html", ["case", "cases-index"]]]
-      : []),
-    ["Clients", "clients.html", ["clients"]],
-    ["Pricing", "pricing.html", ["pricing"]],
-    ["Reviews", "reviews.html", ["reviews"]],
-    ["About me", "about.html", ["about"]],
-  ];
-  const hrefFor = (file) => {
-    const [page, anchor] = file.split("#");
-    return pageLink(page) + (anchor ? "#" + anchor : "");
-  };
-  const nav = () =>
-    links.map(([label, file, pages]) =>
-      i(
-        "a",
-        {
-          href: hrefFor(file),
-          "aria-current": pages.includes(route) ? "page" : undefined,
-          onClick: () => setOpen(false),
-          children: label,
-        },
-        file,
-      ),
-    );
-  return i("header", {
-    className: "site-header",
-    children: [
-      i("div", {
-        className: "header-inner",
-        children: [
-          i("a", {
-            href: pageLink("index.html"),
-            className: "brand",
-            "aria-label": "Ads by Kanapiya — " + translateText("Home"),
-            children: [
-              i("span", { className: "brand-mark", children: "AK" }),
-              i("span", { children: "Ads by Kanapiya" }),
-            ],
-          }),
-          i("nav", {
-            className: "desktop-nav",
-            "aria-label": translateText("Menu"),
-            children: nav(),
-          }),
-          i("div", {
-            className: "header-controls",
-            children: [
-              i(Action, {
-                href: inquiryLink(),
-                children: translateText("Contact"),
-              }),
-              i(LanguageSwitch, {}),
-              i("button", {
-                type: "button",
-                className: "menu-toggle",
-                "aria-expanded": open,
-                "aria-controls": "mobile-navigation",
-                "aria-label": translateText(open ? "Close menu" : "Open menu"),
-                onClick: () => setOpen(!open),
-                children: open ? "×" : "☰",
-              }),
-            ],
-          }),
-        ],
-      }),
-      open
-        ? i("nav", {
-            id: "mobile-navigation",
-            className: "mobile-navigation",
-            "aria-label": translateText("Menu"),
-            children: nav(),
-          })
-        : null,
-    ],
-  });
+  return i(MegaHeader, {});
 }
 function ServiceCard({ service }) {
   const fee = servicePrices(service.id, service.pricing?.[1]?.pkg);
@@ -1198,6 +1112,7 @@ function SiteFooter() {
                   }),
                 ],
               }),
+              i(FooterSocials, {}),
               i("p", {
                 className: "contact-location",
                 children:
