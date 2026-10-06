@@ -36,6 +36,225 @@ window.ABOUT_PROFILE = {
     "AEO / GEO",
     "AI",
   ],
+  // Dates are taken from the linked public records or certificate scans.
+  timeline: [
+    {
+      year: "2015",
+      tag: { ru: "Проект", en: "Project" },
+      title: {
+        ru: "XXIGASYR · HackDay Almaty",
+        en: "XXIGASYR · HackDay Almaty",
+      },
+      text: {
+        ru: "Представил идею образовательного портала о технологиях на русском и казахском языках. В архиве HackDay указан как автор и основатель проекта.",
+        en: "Proposed a technology education portal in Russian and Kazakh. The HackDay archive lists me as the project’s author and founder.",
+      },
+      url: "https://history.hackday.ru/almaty2015/projects",
+    },
+    {
+      year: "2020",
+      tag: { ru: "Обучение", en: "Learning" },
+      title: {
+        ru: "Qwant · практика программирования",
+        en: "Qwant · programming practice",
+      },
+      text: {
+        ru: "Опыт обучения в Qwant и знакомство с подходом Alem School описал в личном блоге: самостоятельная работа, задачи и обучение через практику.",
+        en: "Wrote about studying at Qwant and the Alem School approach on my blog: independent work, problem-solving and learning through practice.",
+      },
+      url: "https://kanapiya.ru/qwant-kz-summer-reactor-program-review/",
+    },
+    {
+      year: "2024",
+      tag: { ru: "Data Science", en: "Data Science" },
+      title: { ru: "Able · TechOrda", en: "Able · TechOrda" },
+      text: {
+        ru: "Начал обучение Data Science по программе TechOrda. Развиваю навыки работы с данными и Python в дополнение к маркетингу и фронтенду.",
+        en: "Started studying Data Science through TechOrda, developing data and Python skills alongside marketing and frontend development.",
+      },
+      url: "https://github.com/muhamed-kanapiya",
+    },
+    {
+      year: "2024",
+      tag: { ru: "Выступление", en: "Speaking" },
+      title: { ru: "Спикер DevFest Astana", en: "DevFest Astana speaker" },
+      text: {
+        ru: "Выступил на Google DevFest Astana. Получил благодарственный сертификат от GDG Astana за вклад в программу конференции.",
+        en: "Spoke at Google DevFest Astana and received a certificate of appreciation from GDG Astana for contributing to the event.",
+      },
+      certificateId: "devfest",
+    },
+    {
+      year: "2025",
+      tag: { ru: "Хакатон", en: "Hackathon" },
+      title: {
+        ru: "IdeaForge · финал чемпионата",
+        en: "IdeaForge · championship final",
+      },
+      text: {
+        ru: "Командный проект IdeaForge вышел в финал Google Firebase Studio Central Asia Championship 30 сентября 2025 года.",
+        en: "Team project IdeaForge reached the final of the Google Firebase Studio Central Asia Championship on 30 September 2025.",
+      },
+      certificateId: "ideaforge",
+    },
+    {
+      year: "2026",
+      tag: { ru: "Сертификат", en: "Certificate" },
+      title: {
+        ru: "Python, анализ данных и ML · C-DAC",
+        en: "Python, data analysis & ML · C-DAC",
+      },
+      text: {
+        ru: "Завершил 80-часовой курс Data Analysis & Machine Learning Using Python в C-DAC, Нью-Дели, по программе ITEC. Обучение проходило 20–31 июля.",
+        en: "Completed the 80-hour Data Analysis & Machine Learning Using Python course at C-DAC, New Delhi, through ITEC, from 20 to 31 July.",
+      },
+      certificateId: "india",
+    },
+  ],
+  certificates: [
+    {
+      id: "india",
+      year: "2026",
+      issuer: "C-DAC · ITEC · New Delhi",
+      title: {
+        ru: "Data Analysis & Machine Learning Using Python",
+        en: "Data Analysis & Machine Learning Using Python",
+      },
+      type: { ru: "Курс · 80 часов", en: "Course · 80 hours" },
+      description: {
+        ru: "Сертификат об успешном завершении курса. 20–31 июля 2026 года, C-DAC, Нью-Дели, Индия.",
+        en: "Certificate of successful course completion. 20–31 July 2026, C-DAC, New Delhi, India.",
+      },
+      image: "assets/media/certificates/india.jpg",
+      sourceUrl:
+        "https://github.com/muhamed-kanapiya/muhamed-kanapiya/blob/main/img/india.jpg",
+    },
+    {
+      id: "ideaforge",
+      year: "2025",
+      issuer: "GDG Cloud Astana · Google for Developers",
+      title: {
+        ru: "Firebase Studio Central Asia Championship",
+        en: "Firebase Studio Central Asia Championship",
+      },
+      type: {
+        ru: "Финалист · команда IdeaForge",
+        en: "Finalist · team IdeaForge",
+      },
+      description: {
+        ru: "Командный сертификат IdeaForge за выход в финал чемпионата 30 сентября 2025 года.",
+        en: "Team certificate awarded to IdeaForge for reaching the championship final on 30 September 2025.",
+      },
+      image: "assets/media/certificates/ideaforge.jpg",
+      sourceUrl:
+        "https://github.com/muhamed-kanapiya/muhamed-kanapiya/blob/main/img/ideaforge.jpg",
+    },
+    {
+      id: "devfest",
+      year: "2024",
+      issuer: "GDG Astana",
+      title: { ru: "Google DevFest Astana", en: "Google DevFest Astana" },
+      type: { ru: "Спикер конференции", en: "Conference speaker" },
+      description: {
+        ru: "Благодарственный сертификат за выступление и вклад в Google DevFest Astana 2024.",
+        en: "Certificate of appreciation for speaking at and contributing to Google DevFest Astana 2024.",
+      },
+      image: "assets/media/certificates/devfest.jpg",
+      sourceUrl:
+        "https://github.com/muhamed-kanapiya/muhamed-kanapiya/blob/main/img/devfest.jpg",
+    },
+  ],
+  education: [
+    {
+      provider: "Scrimba",
+      title: "Learn UI Design Fundamentals · Learn JavaScript",
+      text: {
+        ru: "Основы интерфейсов и JavaScript",
+        en: "Interface fundamentals and JavaScript",
+      },
+    },
+    {
+      provider: "Hyperskill",
+      title: "JavaScript Core",
+      text: {
+        ru: "База языка и практика программирования",
+        en: "Language fundamentals and programming practice",
+      },
+    },
+    {
+      provider: "Metaschool",
+      title: "Solidity · Q Blockchain",
+      text: {
+        ru: "Первые смарт-контракты и проект Gamer DAO",
+        en: "First smart contracts and a Gamer DAO project",
+      },
+    },
+  ],
+  github: {
+    url: "https://github.com/muhamed-kanapiya",
+    username: "muhamed-kanapiya",
+    projects: [
+      {
+        name: "portfolio",
+        stack: "JavaScript · CSS · GitHub Pages",
+        url: "https://github.com/muhamed-kanapiya/portfolio",
+        description: {
+          ru: "Этот сайт: два языка, каталог услуг, кейсы, ручные цены и публикация через GitHub Actions.",
+          en: "This website: two languages, service catalog, case studies, manual pricing and deployment with GitHub Actions.",
+        },
+      },
+      {
+        name: "domain_for_sale",
+        stack: "HTML · CSS",
+        url: "https://github.com/muhamed-kanapiya/domain_for_sale",
+        description: {
+          ru: "Адаптивный шаблон страницы для продажи доменных имён. Открытый код и готовая структура лендинга.",
+          en: "A responsive domain-for-sale page template with public source code and a ready-made landing page structure.",
+        },
+      },
+    ],
+  },
+  // Add only real profile URLs. Messenger contacts stay in config.js.
+  socialLinks: [
+    {
+      id: "telegram-channel",
+      icon: "telegram",
+      name: "Telegram",
+      handle: "@qazaqbiz",
+      url: "https://t.me/qazaqbiz",
+      description: { ru: "Мой канал", en: "My channel" },
+    },
+    {
+      id: "x",
+      icon: "x",
+      name: "X / Twitter",
+      handle: "@qazbiz",
+      url: "https://twitter.com/qazbiz",
+      description: { ru: "Публичный профиль", en: "Public profile" },
+    },
+    {
+      id: "habr",
+      icon: "code",
+      name: "Хабр Q&A",
+      handle: "muhamed_kanapiya",
+      url: "https://qna.habr.com/user/muhamed_kanapiya",
+      description: {
+        ru: "Вопросы и ответы о разработке",
+        en: "Development questions and answers",
+      },
+    },
+    {
+      id: "blog",
+      icon: "globe",
+      name: "Kanapiya.ru",
+      handle: "kanapiya.ru",
+      url: "https://kanapiya.ru/",
+      description: {
+        ru: "Блог о маркетинге и технологиях",
+        en: "Marketing and technology blog",
+      },
+    },
+  ],
   sources: [
     { label: "Kanapiya.ru", url: "https://kanapiya.ru/about-me/" },
     {

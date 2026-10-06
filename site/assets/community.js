@@ -506,8 +506,442 @@ function AboutSection() {
     ],
   });
 }
+function AuthorIcon({ name }) {
+  const paths = {
+    github:
+      "M9 19c-4 1-4-2-6-2m12 5v-4a3.5 3.5 0 0 0-1-2.7c3.3-.4 6.8-1.6 6.8-7.3a5.7 5.7 0 0 0-1.5-4c.2-1.2.2-2.4-.5-3.5 0 0-1.3-.4-4.2 1.5a14.5 14.5 0 0 0-7.6 0C4.1.1 2.8.5 2.8.5c-.7 1.1-.7 2.3-.5 3.5A5.7 5.7 0 0 0 .8 8c0 5.7 3.5 6.9 6.8 7.3A3.5 3.5 0 0 0 6.6 18v4",
+    telegram: "m21 3-4 18-6-5-4 3 1-7 10-6-12 8-5-2Z",
+    x: "m4 3 16 18h-5L0 3h5ZM20 3 4 21",
+    code: "m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18",
+    globe:
+      "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z",
+    whatsapp:
+      "M20 11a8 8 0 0 1-12 7l-5 2 1-5a8 8 0 1 1 16-4ZM8 7c0 5 3 8 7 8l1-2-3-1-1 1-2-3 1-1-1-2Z",
+  };
+  return i("svg", {
+    viewBox: "-1 -1 26 26",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+    children: i("path", { d: paths[name] || paths.globe }),
+  });
+}
+function AuthorSectionHeading({ eyebrow, title, text }) {
+  return i("div", {
+    className: "author-section-heading",
+    children: [
+      i("span", { className: "section-eyebrow", children: eyebrow }),
+      i("h2", { children: title }),
+      text ? i("p", { children: text }) : null,
+    ],
+  });
+}
+function CertificateDialog({ certificate, trigger, onClose }) {
+  const ref = le.useRef(null),
+    pressedOutside = le.useRef(false);
+  le.useEffect(() => {
+    const dialog = ref.current,
+      overflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    const close = () => onClose();
+    window.addEventListener("hashchange", close);
+    return () => {
+      window.removeEventListener("hashchange", close);
+      if (dialog.open) dialog.close();
+      document.body.style.overflow = overflow;
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+    };
+  }, [certificate.id]);
+  const outside = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    );
+  };
+  return i("dialog", {
+    ref,
+    className: "client-dialog certificate-dialog",
+    "aria-labelledby": "certificate-title",
+    onCancel: (event) => {
+      event.preventDefault();
+      onClose();
+    },
+    onPointerDown: (event) => {
+      pressedOutside.current =
+        event.target === event.currentTarget && outside(event);
+    },
+    onClick: (event) => {
+      if (
+        pressedOutside.current &&
+        event.target === event.currentTarget &&
+        outside(event)
+      )
+        onClose();
+    },
+    children: [
+      i("div", {
+        className: "client-dialog-header",
+        children: [
+          i("div", {
+            children: [
+              i("span", {
+                className: "section-eyebrow",
+                children: certificate.issuer + " · " + certificate.year,
+              }),
+              i("h2", {
+                id: "certificate-title",
+                children: profileCopy(certificate.title),
+              }),
+            ],
+          }),
+          i("button", {
+            type: "button",
+            autoFocus: true,
+            className: "client-dialog-close",
+            "aria-label": translateText("Close certificate"),
+            onClick: onClose,
+            children: "×",
+          }),
+        ],
+      }),
+      i("div", {
+        className: "client-dialog-body",
+        children: [
+          i("img", {
+            className: "certificate-full-image",
+            src: certificate.image,
+            alt:
+              profileCopy(certificate.title) +
+              " · " +
+              profileCopy(certificate.type),
+            width: 1280,
+            height: 905,
+          }),
+          i("p", {
+            className: "certificate-caption",
+            children: profileCopy(certificate.description),
+          }),
+          i("div", {
+            className: "detail-actions",
+            children: [
+              i(Action, {
+                href: certificate.image,
+                target: "_blank",
+                secondary: true,
+                children: "Open full-size image ↗",
+              }),
+              i("a", {
+                className: "author-text-link",
+                href: certificate.sourceUrl,
+                target: "_blank",
+                "data-outbound": "certificate-" + certificate.id,
+                children: "Source on GitHub ↗",
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+function AboutTimeline({ profile, onCertificate }) {
+  return i("section", {
+    className: "author-section author-timeline-section",
+    id: "journey",
+    children: [
+      i(AuthorSectionHeading, {
+        eyebrow: "MY JOURNEY",
+        title: "From first projects to data and AI.",
+        text: "Projects, learning and community — the milestones that shaped my work.",
+      }),
+      i("ol", {
+        className: "author-timeline",
+        children: profile.timeline.map((item, index) =>
+          i(
+            "li",
+            {
+              children: [
+                i("span", { className: "timeline-year", children: item.year }),
+                i("div", {
+                  className: "timeline-entry",
+                  children: [
+                    i("span", {
+                      className: "timeline-tag",
+                      children: profileCopy(item.tag),
+                    }),
+                    i("h3", { children: profileCopy(item.title) }),
+                    i("p", { children: profileCopy(item.text) }),
+                    item.certificateId
+                      ? i("button", {
+                          type: "button",
+                          className: "author-text-link",
+                          "aria-haspopup": "dialog",
+                          onClick: (event) =>
+                            onCertificate(
+                              profile.certificates.find(
+                                (cert) => cert.id === item.certificateId,
+                              ),
+                              event.currentTarget,
+                            ),
+                          children: "View certificate ↗",
+                        })
+                      : i("a", {
+                          className: "author-text-link",
+                          href: item.url,
+                          target: "_blank",
+                          "data-outbound": "author-timeline-" + index,
+                          children: "Read more ↗",
+                        }),
+                  ],
+                }),
+              ],
+            },
+            item.year + "-" + index,
+          ),
+        ),
+      }),
+    ],
+  });
+}
+function AboutCertificates({ profile, onCertificate }) {
+  return i("section", {
+    className: "author-section",
+    id: "certificates",
+    children: [
+      i(AuthorSectionHeading, {
+        eyebrow: "LEARNING & COMMUNITY",
+        title: "Certificates and participation.",
+        text: "Course completion, a conference talk and a team competition. Open a card to see the original document.",
+      }),
+      i("div", {
+        className: "certificate-grid",
+        children: profile.certificates.map((cert) =>
+          i(
+            "button",
+            {
+              type: "button",
+              className: "certificate-card",
+              "aria-haspopup": "dialog",
+              "aria-label":
+                translateText("View certificate") +
+                ": " +
+                profileCopy(cert.title),
+              onClick: (event) => onCertificate(cert, event.currentTarget),
+              children: [
+                i("span", {
+                  className: "certificate-image",
+                  children: [
+                    i("img", {
+                      src: cert.image,
+                      alt: "",
+                      width: 1280,
+                      height: 905,
+                      loading: "lazy",
+                    }),
+                    i("span", {
+                      className: "certificate-expand",
+                      "aria-hidden": true,
+                      children: "↗",
+                    }),
+                  ],
+                }),
+                i("span", {
+                  className: "certificate-details",
+                  children: [
+                    i("span", {
+                      className: "certificate-meta",
+                      children: [
+                        i("span", { children: profileCopy(cert.type) }),
+                        i("span", { children: cert.year }),
+                      ],
+                    }),
+                    i("strong", { children: profileCopy(cert.title) }),
+                    i("span", {
+                      className: "certificate-issuer",
+                      children: cert.issuer,
+                    }),
+                  ],
+                }),
+              ],
+            },
+            cert.id,
+          ),
+        ),
+      }),
+      i("div", {
+        className: "author-education",
+        children: [
+          i("div", {
+            children: [
+              i("h3", { children: "Additional courses" }),
+              i("a", {
+                className: "author-text-link",
+                href: profile.github.url,
+                target: "_blank",
+                "data-outbound": "author-learning",
+                children: "Learning notes on GitHub ↗",
+              }),
+            ],
+          }),
+          i("ul", {
+            children: profile.education.map((course) =>
+              i(
+                "li",
+                {
+                  children: [
+                    i("span", { children: course.provider }),
+                    i("div", {
+                      children: [
+                        i("strong", { children: course.title }),
+                        i("p", { children: profileCopy(course.text) }),
+                      ],
+                    }),
+                  ],
+                },
+                course.provider,
+              ),
+            ),
+          }),
+        ],
+      }),
+    ],
+  });
+}
+function AboutGithub({ profile }) {
+  return i("section", {
+    className: "author-section author-github",
+    id: "github",
+    children: [
+      i("div", {
+        className: "author-github-intro",
+        children: [
+          i("span", {
+            className: "author-github-symbol",
+            children: i(AuthorIcon, { name: "github" }),
+          }),
+          i(AuthorSectionHeading, {
+            eyebrow: "CODE & EXPERIMENTS",
+            title: "See how I build.",
+            text: "Public repositories, small tools and frontend experiments. Source code you can explore.",
+          }),
+          i(Action, {
+            href: profile.github.url,
+            target: "_blank",
+            "data-outbound": "author-github",
+            children: "Open GitHub ↗",
+          }),
+        ],
+      }),
+      i("div", {
+        className: "author-repos",
+        children: profile.github.projects.map((project) =>
+          i(
+            "a",
+            {
+              href: project.url,
+              target: "_blank",
+              className: "author-repo",
+              "data-outbound": "author-repo-" + project.name,
+              children: [
+                i("span", {
+                  className: "author-repo-name",
+                  children: [
+                    i("strong", { children: project.name }),
+                    i("span", { "aria-hidden": true, children: "↗" }),
+                  ],
+                }),
+                i("p", { children: profileCopy(project.description) }),
+                i("span", {
+                  className: "author-repo-stack",
+                  children: project.stack,
+                }),
+              ],
+            },
+            project.name,
+          ),
+        ),
+      }),
+    ],
+  });
+}
+function AboutSocials({ profile }) {
+  const cfg = window.PORTFOLIO;
+  const direct = [
+    cfg.telegram && {
+      id: "telegram",
+      icon: "telegram",
+      name: "Telegram",
+      handle: "@" + cfg.telegram,
+      url: "https://t.me/" + cfg.telegram,
+      description: { ru: "Написать лично", en: "Message me directly" },
+    },
+    cfg.whatsapp && {
+      id: "whatsapp",
+      icon: "whatsapp",
+      name: "WhatsApp",
+      handle: "+" + cfg.whatsapp,
+      url: "https://wa.me/" + cfg.whatsapp,
+      description: { ru: "Обсудить вашу задачу", en: "Discuss your project" },
+    },
+  ].filter(Boolean);
+  return i("section", {
+    className: "author-section",
+    id: "socials",
+    children: [
+      i(AuthorSectionHeading, {
+        eyebrow: "LET’S CONNECT",
+        title: "Find me online.",
+        text: "Write to me about a project, follow my channel or read my notes.",
+      }),
+      i("div", {
+        className: "author-social-grid",
+        children: [...direct, ...profile.socialLinks].map((link) =>
+          i(
+            "a",
+            {
+              href: link.url,
+              target: "_blank",
+              className: "author-social",
+              "data-outbound": "author-social-" + link.id,
+              children: [
+                i("span", {
+                  className: "author-social-icon",
+                  children: i(AuthorIcon, { name: link.icon }),
+                }),
+                i("span", {
+                  className: "author-social-copy",
+                  children: [
+                    i("strong", { children: link.name }),
+                    i("span", { children: link.handle }),
+                    i("small", { children: profileCopy(link.description) }),
+                  ],
+                }),
+                i("span", {
+                  className: "author-social-arrow",
+                  "aria-hidden": true,
+                  children: "↗",
+                }),
+              ],
+            },
+            link.id,
+          ),
+        ),
+      }),
+    ],
+  });
+}
 function AboutPage() {
   const profile = window.ABOUT_PROFILE;
+  const [selectedCertificate, setSelectedCertificate] = le.useState(null);
+  const openCertificate = (certificate, trigger) =>
+    setSelectedCertificate({ certificate, trigger });
   const principles = [
     [
       "01",
@@ -587,6 +1021,28 @@ function AboutPage() {
           }),
         ],
       }),
+      i("nav", {
+        className: "author-jump-links",
+        "aria-label": translateText("On this page"),
+        children: [
+          ["journey", "My journey"],
+          ["certificates", "Certificates"],
+          ["github", "GitHub"],
+          ["socials", "Social profiles"],
+        ].map(([id, label]) =>
+          i(
+            "a",
+            {
+              href: "#" + id,
+              children: [
+                label,
+                i("span", { "aria-hidden": true, children: "↓" }),
+              ],
+            },
+            id,
+          ),
+        ),
+      }),
       i("section", {
         className: "about-story",
         children: [
@@ -610,6 +1066,9 @@ function AboutPage() {
           }),
         ],
       }),
+      i(AboutTimeline, { profile, onCertificate: openCertificate }),
+      i(AboutCertificates, { profile, onCertificate: openCertificate }),
+      i(AboutGithub, { profile }),
       i("section", {
         className: "about-principles",
         children: principles.map(([number, title, description]) =>
@@ -626,6 +1085,7 @@ function AboutPage() {
           ),
         ),
       }),
+      i(AboutSocials, { profile }),
       i("section", {
         className: "about-reading",
         children: [
@@ -650,6 +1110,12 @@ function AboutPage() {
           }),
         ],
       }),
+      selectedCertificate
+        ? i(CertificateDialog, {
+            ...selectedCertificate,
+            onClose: () => setSelectedCertificate(null),
+          })
+        : null,
     ],
   });
 }
@@ -745,4 +1211,33 @@ Object.assign(window.RU, {
   "Full cycle": "Полный цикл",
   "From audit to launch": "От аудита до запуска",
   "One specialist": "Один специалист",
+  "MY JOURNEY": "ПРОФЕССИОНАЛЬНЫЙ ПУТЬ",
+  "My journey": "Мой путь",
+  "From first projects to data and AI.": "От первых проектов к данным и ИИ.",
+  "Projects, learning and community — the milestones that shaped my work.":
+    "Проекты, обучение и профессиональное сообщество — события, которые сформировали мой подход к работе.",
+  "LEARNING & COMMUNITY": "ОБУЧЕНИЕ И УЧАСТИЕ",
+  "Certificates and participation.": "Сертификаты и достижения.",
+  "Course completion, a conference talk and a team competition. Open a card to see the original document.":
+    "Обучение, выступление на конференции и командное соревнование. Нажмите на карточку, чтобы рассмотреть документ.",
+  Certificates: "Сертификаты",
+  "View certificate": "Открыть сертификат",
+  "View certificate ↗": "Смотреть сертификат ↗",
+  "Close certificate": "Закрыть сертификат",
+  "Read more ↗": "Подробнее ↗",
+  "Open full-size image ↗": "Изображение целиком ↗",
+  "Source on GitHub ↗": "Источник на GitHub ↗",
+  "Additional courses": "Дополнительные курсы",
+  "Learning notes on GitHub ↗": "Об обучении на GitHub ↗",
+  "CODE & EXPERIMENTS": "КОД И ЭКСПЕРИМЕНТЫ",
+  "See how I build.": "Мои проекты изнутри.",
+  "Open GitHub ↗": "Открыть GitHub ↗",
+  "Public repositories, small tools and frontend experiments. Source code you can explore.":
+    "Открытые репозитории, небольшие инструменты и эксперименты с фронтендом. Можно заглянуть в исходный код.",
+  "LET’S CONNECT": "НА СВЯЗИ",
+  "Find me online.": "Где меня найти.",
+  "Write to me about a project, follow my channel or read my notes.":
+    "Напишите о проекте, подпишитесь на канал или почитайте заметки в блоге.",
+  "Social profiles": "Соцсети",
+  "On this page": "На этой странице",
 });

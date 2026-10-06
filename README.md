@@ -118,7 +118,7 @@ showDemoCases: false;
 
 ## Где редактировать
 
-- `site/index.html`, `services.html`, `cases.html`, `clients.html`, `pricing.html` — пять точек входа.
+- `site/index.html`, `services.html`, `cases.html`, `clients.html`, `pricing.html`, `reviews.html`, `about.html` — семь точек входа.
 - `site/assets/pricing-page.js`, `pricing-page.css` — таблица цен, поиск и фильтры.
 - `site/assets/config.js` — имя, контакты, валюта по умолчанию, показ демо и лимит клиентов.
 - `site/assets/prices.js` — все цены в USD, RUB и KZT вручную.
@@ -132,5 +132,19 @@ showDemoCases: false;
 - `site/assets/portfolio.js` — язык, маршруты и клиентские карточки.
 - `site/assets/translations.js` — русские переводы исходного макета.
 - `site/assets/extensions.css` — стили новых компонентов и адаптивность.
+- `site/assets/profile-data.js` — биография, таймлайн, сертификаты, соцсети, проекты GitHub, отзывы и обложки кейсов.
+- `site/assets/community.js`, `community.css` — страница автора, отзывы, галереи и попапы.
+
+## Страница автора
+
+Все данные страницы `about.html` редактируются в `window.ABOUT_PROFILE` файла **`site/assets/profile-data.js`**:
+
+- `timeline` — год, тип события, заголовок и описание на RU/EN. `url` ведёт к источнику; `certificateId` вместо ссылки открывает сертификат с таким `id`.
+- `certificates` — название, год, организация (`issuer`), тип участия, описание, путь `image` и ссылка на оригинал `sourceUrl`. Скан положите в `site/assets/media/certificates/`; карточка и попап появятся автоматически.
+- `education` — дополнительные курсы без выдуманных дат и подтверждений.
+- `github.projects` — выбранные публичные репозитории и описания; статистика GitHub не подгружается и не имитируется.
+- `socialLinks` — реальные адреса профилей, подписи и иконки (`telegram`, `x`, `code`, `globe`, `github`, `whatsapp`). Прямые WhatsApp и Telegram берутся из `config.js`.
+
+Таймлайн основан на архиве HackDay, личном блоге, профиле GitHub и трёх опубликованных там сертификатах. DevFest — сертификат спикера, IdeaForge — командный выход в финал, C-DAC — завершение 80-часового курса. Они не обозначены как профессиональная сертификация Google Ads. Копии документов хранятся локально; источники записаны в `site/assets/media/SOURCES.json`. Попап закрывается крестиком, Escape или нажатием снаружи, затем возвращает фокус на карточку.
 
 Исходный визуальный референс: https://www.meta.ai/share/a/12a12a81-5250-41de-b03b-64bdcf4aad43. Компании с первоначального примерного скриншота не включены.

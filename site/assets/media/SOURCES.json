@@ -1,8 +1,47 @@
 [
-  {"file":"muhamed-kanapiya.jpg","page":"https://kanapiya.ru/about-me/","source":"https://kanapiya.ru/wp-content/uploads/2018/01/ZHaksylyk-Mukhamed-Kanapiya.jpg"},
-  {"file":"passimpay.png","page":"https://passimpay.io/en","source":"https://passimpay.io/_next/static/media/url_cover2_480.84511b5b.png"},
-  {"file":"kilc.webp","page":"https://kilc.edu.kz/","source":"https://kilc.edu.kz/wp-content/uploads/2024/06/IMG_8341-1024x683.webp"},
-  {"file":"maze-rooms.jpg","page":"https://mazerooms.com/","source":"https://mazerooms.com/wp-content/uploads/2023/10/header-slider-1-min.jpg"},
-  {"file":"topanga.webp","page":"https://www.topangapetresort.com/","source":"https://topangapetresort.com/wp-content/uploads/2026/07/puppy-768x614.webp"},
-  {"file":"panama.png","page":"https://panama.kz","source":"https://panama.kz/assets/img/unconted_sm.png"}
+  {
+    "file": "muhamed-kanapiya.jpg",
+    "page": "https://kanapiya.ru/about-me/",
+    "source": "https://kanapiya.ru/wp-content/uploads/2018/01/ZHaksylyk-Mukhamed-Kanapiya.jpg"
+  },
+  {
+    "file": "passimpay.png",
+    "page": "https://passimpay.io/en",
+    "source": "https://passimpay.io/_next/static/media/url_cover2_480.84511b5b.png"
+  },
+  {
+    "file": "kilc.webp",
+    "page": "https://kilc.edu.kz/",
+    "source": "https://kilc.edu.kz/wp-content/uploads/2024/06/IMG_8341-1024x683.webp"
+  },
+  {
+    "file": "maze-rooms.jpg",
+    "page": "https://mazerooms.com/",
+    "source": "https://mazerooms.com/wp-content/uploads/2023/10/header-slider-1-min.jpg"
+  },
+  {
+    "file": "topanga.webp",
+    "page": "https://www.topangapetresort.com/",
+    "source": "https://topangapetresort.com/wp-content/uploads/2026/07/puppy-768x614.webp"
+  },
+  {
+    "file": "panama.png",
+    "page": "https://panama.kz",
+    "source": "https://panama.kz/assets/img/unconted_sm.png"
+  },
+  {
+    "file": "certificates/devfest.jpg",
+    "page": "https://github.com/muhamed-kanapiya/muhamed-kanapiya",
+    "source": "https://raw.githubusercontent.com/muhamed-kanapiya/muhamed-kanapiya/main/img/devfest.jpg"
+  },
+  {
+    "file": "certificates/ideaforge.jpg",
+    "page": "https://github.com/muhamed-kanapiya/muhamed-kanapiya",
+    "source": "https://raw.githubusercontent.com/muhamed-kanapiya/muhamed-kanapiya/main/img/ideaforge.jpg"
+  },
+  {
+    "file": "certificates/india.jpg",
+    "page": "https://github.com/muhamed-kanapiya/muhamed-kanapiya",
+    "source": "https://raw.githubusercontent.com/muhamed-kanapiya/muhamed-kanapiya/main/img/india.jpg"
+  }
 ]

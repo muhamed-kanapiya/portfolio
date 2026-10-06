@@ -669,6 +669,36 @@ console.log(
 
 // New content must stay portable, sourced, and respect drafts in both languages.
 await access(path.join(site, state.window.ABOUT_PROFILE.photo));
+const author = state.window.ABOUT_PROFILE;
+const certificateIds = new Set();
+for (const certificate of author.certificates) {
+  assert(!certificateIds.has(certificate.id), "Certificate IDs must be unique");
+  certificateIds.add(certificate.id);
+  assert(certificate.title.ru && certificate.title.en && certificate.issuer);
+  assert(new URL(certificate.sourceUrl).protocol === "https:");
+  await access(path.join(site, certificate.image));
+}
+for (const milestone of author.timeline) {
+  assert(
+    milestone.title.ru &&
+      milestone.title.en &&
+      milestone.text.ru &&
+      milestone.text.en,
+  );
+  if (milestone.certificateId)
+    assert(
+      certificateIds.has(milestone.certificateId),
+      "Timeline must reference an existing certificate",
+    );
+  else assert(new URL(milestone.url).protocol === "https:");
+}
+for (const link of [...author.socialLinks, ...author.github.projects]) {
+  assert(new URL(link.url).protocol === "https:");
+  assert(
+    !/YOUR_|your-portfolio|example\.com/.test(link.url),
+    "Do not publish placeholder profiles",
+  );
+}
 for (const [clientId, cover] of Object.entries(state.window.CLIENT_COVERS)) {
   assert(state.window.CLIENTS.some((client) => client.id === clientId));
   await access(path.join(site, cover));
