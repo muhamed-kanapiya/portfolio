@@ -62,10 +62,9 @@ function detailLink(kind, id) {
   );
 }
 function catalogSummary() {
-  const count = publishedCases().length;
   return currentLanguage === "ru"
-    ? `${portfolioCount(tu.length)} УСЛУГ • ${portfolioCount(window.CLIENTS.length)} КЛИЕНТОВ${count ? " • " + portfolioCount(count) + " КЕЙСОВ" : ""}`
-    : `${portfolioCount(tu.length)} SERVICES • ${portfolioCount(window.CLIENTS.length)} CLIENTS${count ? " • " + portfolioCount(count) + " CASES" : ""}`;
+    ? "СТРАТЕГИЯ → ЗАПУСК → РОСТ"
+    : "STRATEGY → LAUNCH → GROWTH";
 }
 function portfolioCount(count) {
   return count < 5 ? String(count) : Math.floor(count / 5) * 5 + "+";
@@ -114,8 +113,9 @@ function SiteHeader() {
       ? [["Case studies", "cases.html", ["case", "cases-index"]]]
       : []),
     ["Clients", "clients.html", ["clients"]],
-    ["Process", "index.html#process", []],
     ["Pricing", "pricing.html", ["pricing"]],
+    ["Reviews", "reviews.html", ["reviews"]],
+    ["About me", "about.html", ["about"]],
   ];
   const hrefFor = (file) => {
     const [page, anchor] = file.split("#");
@@ -292,6 +292,7 @@ function CaseCard({ record }) {
       className: "case-tile",
       href: detailLink("case", record.id),
       children: [
+        i(CaseArtwork, { record }),
         i("div", {
           className: "case-card-top",
           children: [
@@ -1163,6 +1164,8 @@ function SiteFooter() {
                 : null,
               i("a", { href: pageLink("clients.html"), children: "Clients" }),
               i("a", { href: pageLink("pricing.html"), children: "Pricing" }),
+              i("a", { href: pageLink("reviews.html"), children: "Reviews" }),
+              i("a", { href: pageLink("about.html"), children: "About me" }),
             ],
           }),
           i("span", { children: "Google Ads · SEO · Web · Analytics" }),

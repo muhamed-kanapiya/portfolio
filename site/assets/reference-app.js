@@ -1978,7 +1978,11 @@ function Ni() {
                       ? "Projects and outcomes"
                       : "Search and advertising",
                   },
-                  { k: "RU / EN", v: "Two languages", sub: "Working remotely" },
+                  {
+                    k: "Full cycle",
+                    v: "One specialist",
+                    sub: "From audit to launch",
+                  },
                 ].map((h) =>
                   c(
                     "div",
@@ -2009,6 +2013,8 @@ function Ni() {
             i(ServicesSection, {}),
             i(ClientsSection, {}),
             i(CasesSection, {}),
+            i(ReviewsSection, {}),
+            i(AboutSection, {}),
             i("section", {
               id: "process",
               className: "mx-auto max-w-[1280px] px-6 py-16 md:py-24",
@@ -2138,6 +2144,8 @@ function Ni() {
         }),
       e === "clients" && i(ClientsPage, {}),
       e === "pricing" && i(PricingPage, {}),
+      e === "reviews" && i(ReviewsPage, {}),
+      e === "about" && i(AboutPage, {}),
       e === "services-index" && i(ArchivePage, { kind: "services" }),
       e === "cases-index" && i(ArchivePage, { kind: "cases" }),
       e === "service" && i(ServiceDetail, { service: w(n) }),

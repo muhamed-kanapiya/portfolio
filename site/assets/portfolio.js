@@ -59,7 +59,11 @@ function readRoute() {
                 ? "cases-index"
                 : file === "pricing.html"
                   ? "pricing"
-                  : "home",
+                  : file === "reviews.html"
+                    ? "reviews"
+                    : file === "about.html"
+                      ? "about"
+                      : "home",
     service:
       segments[0] === "services" ? segments[1] || "search-ads" : "search-ads",
     caseId: segments[0] === "cases" ? segments[1] || "ecom-us" : "ecom-us",
@@ -413,6 +417,9 @@ function PortfolioRoot() {
       if (route.page === "cases-index")
         title = translateText("All case studies");
       if (route.page === "pricing") title = translateText("Service pricing");
+      if (route.page === "reviews") title = translateText("Reviews");
+      if (route.page === "about")
+        title = profileCopy(window.ABOUT_PROFILE.name);
       if (route.page === "service")
         title = translateText(
           tu.find((item) => item.id === route.service)?.title || "Services",
@@ -421,9 +428,15 @@ function PortfolioRoot() {
         title = translateText(visibleCase(route.caseId)?.title || "Cases");
       document.title = title + " — " + window.PORTFOLIO.name;
       document.querySelector('meta[name="description"]').content =
-        translateText(
-          "Google Ads, SEO, GA4 / GTM and web development. Services, case studies and clients.",
-        );
+        route.page === "about"
+          ? profileCopy(window.ABOUT_PROFILE.intro)
+          : route.page === "reviews"
+            ? translateText(
+                "A selection of public feedback. Authors, ratings and links to the original sources.",
+              )
+            : translateText(
+                "Google Ads, SEO, GA4 / GTM and web development. Services, case studies and clients.",
+              );
     };
     updateMetadata();
     window.addEventListener("hashchange", updateMetadata);

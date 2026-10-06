@@ -16,6 +16,8 @@ for (const page of [
   "services.html",
   "cases.html",
   "pricing.html",
+  "reviews.html",
+  "about.html",
 ]) {
   const html = await readFile(path.join(site, page), "utf8");
   assert(
@@ -33,6 +35,7 @@ for (const file of [
   "prices.js",
   "clients.js",
   "translations.js",
+  "profile-data.js",
 ]) {
   vm.runInContext(
     await readFile(path.join(site, "assets", file), "utf8"),
@@ -53,7 +56,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, five HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, seven HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -63,6 +66,11 @@ const state = {
     RU: context.window.RU,
     CLIENTS: [],
     PRICES: context.window.PRICES,
+    ABOUT_PROFILE: context.window.ABOUT_PROFILE,
+    CLIENT_COVERS: context.window.CLIENT_COVERS,
+    REVIEWS: context.window.REVIEWS,
+    REVIEW_PLATFORMS: context.window.REVIEW_PLATFORMS,
+    REVIEW_GOOGLE: context.window.REVIEW_GOOGLE,
   },
   location: { search: "", pathname: "/portfolio/index.html", hash: "" },
   localStorage: { getItem: () => null },
@@ -148,6 +156,10 @@ vm.runInContext(
   await readFile(path.join(site, "assets/extensions.js"), "utf8"),
   behavior,
 );
+vm.runInContext(
+  await readFile(path.join(site, "assets/community.js"), "utf8"),
+  behavior,
+);
 
 assert.equal(vm.runInContext("tu.length", behavior), 25);
 assert.equal(vm.runInContext("Nn.length", behavior), 14);
@@ -177,6 +189,8 @@ for (const [filename, expected] of [
   ["clients.html", "clients"],
   ["index.html", "home"],
   ["pricing.html", "pricing"],
+  ["reviews.html", "reviews"],
+  ["about.html", "about"],
 ]) {
   state.location.pathname = "/portfolio/" + filename;
   state.location.hash = "";
@@ -651,4 +665,60 @@ assert(cancelPrevented);
 assert.equal(modalOpen, false);
 console.log(
   "Checked searchable price tables, currency-aware filters and sorting, and client descriptions with related case dialogs.",
+);
+
+// New content must stay portable, sourced, and respect drafts in both languages.
+await access(path.join(site, state.window.ABOUT_PROFILE.photo));
+for (const [clientId, cover] of Object.entries(state.window.CLIENT_COVERS)) {
+  assert(state.window.CLIENTS.some((client) => client.id === clientId));
+  await access(path.join(site, cover));
+}
+const reviewIds = new Set();
+for (const review of state.window.REVIEWS) {
+  assert(!reviewIds.has(review.id));
+  reviewIds.add(review.id);
+  assert(state.window.REVIEW_PLATFORMS[review.platform]);
+  assert(review.rating === null || (review.rating >= 1 && review.rating <= 5));
+  assert(review.text.ru && review.text.en && review.author);
+  assert(
+    new URL(review.sourceUrl || state.window.REVIEW_GOOGLE.url).protocol ===
+      "https:",
+  );
+}
+assert.equal(vm.runInContext("ReviewStars({rating:null})", behavior), null);
+const reviewCount = vm.runInContext("publicReviews().length", behavior);
+state.window.REVIEWS.push({
+  id: "test-draft",
+  published: false,
+  platform: "google",
+});
+assert.equal(vm.runInContext("publicReviews().length", behavior), reviewCount);
+state.window.REVIEWS.pop();
+for (const language of ["ru", "en"]) {
+  vm.runInContext(`currentLanguage="${language}"`, behavior);
+  assert.equal(
+    vm.runInContext('filteredReviews("google", "BIS").length', behavior),
+    1,
+  );
+  assert.equal(
+    vm.runInContext('filteredReviews("website", "BIS").length', behavior),
+    0,
+  );
+  assert.equal(
+    vm.runInContext(
+      'filteredReviews("all", "not-present-review").length',
+      behavior,
+    ),
+    0,
+  );
+  assert(
+    vm.runInContext(
+      "profileCopy(window.ABOUT_PROFILE.intro).length",
+      behavior,
+    ) > 20,
+  );
+  assert(!/25|35|RU \/ EN/.test(vm.runInContext("catalogSummary()", behavior)));
+}
+console.log(
+  "Checked review drafts, source attribution, bilingual search and local case/profile images.",
 );

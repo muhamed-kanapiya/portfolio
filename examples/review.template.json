@@ -1,0 +1,11 @@
+{
+  "id": "unique-review-id",
+  "author": "Имя автора",
+  "platform": "google",
+  "rating": null,
+  "published": false,
+  "kind": "original",
+  "sourceUrl": "https://example.com/review",
+  "topic": { "ru": "Услуга", "en": "Service" },
+  "text": { "ru": "Полный текст предоставленного автором отзыва.", "en": "Full supplied review text." }
+}
