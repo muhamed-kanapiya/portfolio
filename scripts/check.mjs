@@ -21,6 +21,11 @@ for (const page of [
   "blog.html",
   "blog-category.html",
   "blog-post.html",
+  "privacy.html",
+  "cookies.html",
+  "terms.html",
+  "site-map.html",
+  "404.html",
 ]) {
   const html = await readFile(path.join(site, page), "utf8");
   assert(
@@ -28,7 +33,7 @@ for (const page of [
     "Russian must be the default HTML language",
   );
   for (const [, url] of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
-    if (!/^(?:https?:|data:|mailto:)/.test(url))
+    if (!/^(?:https?:|data:|mailto:|\/)/.test(url))
       await access(path.join(site, url));
   }
 }
@@ -59,7 +64,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, ten HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, fifteen HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -957,4 +962,127 @@ assert.equal(
 );
 console.log(
   "Checked menu service links, blog block structure, drafts, bilingual search, reading time and direct subpath URLs.",
+);
+
+vm.runInContext(
+  await readFile(path.join(site, "assets/utilities.js"), "utf8"),
+  behavior,
+);
+for (const [file, page] of [
+  ["privacy.html", "privacy"],
+  ["cookies.html", "cookies"],
+  ["terms.html", "terms"],
+  ["site-map.html", "site-map"],
+  ["404.html", "not-found"],
+]) {
+  state.location.pathname = "/portfolio/" + file;
+  state.location.hash = "";
+  assert.equal(vm.runInContext("readRoute().page", behavior), page);
+}
+state.window.PORTFOLIO_NOT_FOUND = true;
+state.location.pathname = "/portfolio/missing/nested/page";
+assert.equal(vm.runInContext("readRoute().page", behavior), "not-found");
+state.window.PORTFOLIO_NOT_FOUND = false;
+for (const language of ["ru", "en"]) {
+  vm.runInContext(`currentLanguage="${language}"`, behavior);
+  const groups = vm.runInContext("siteMapGroups()", behavior);
+  assert.equal(
+    groups.find((group) => group.id === "services").links.length,
+    31,
+  );
+  assert.equal(
+    groups.find((group) => group.id === "cases").links.length,
+    vm.runInContext("publishedCases().length", behavior),
+  );
+  assert.equal(groups.find((group) => group.id === "blog").links.length, 9);
+  for (const group of groups) {
+    for (const link of group.links) {
+      assert.equal(typeof link.label, "string");
+      const url = new URL(link.href, "https://example.com/portfolio/");
+      assert.equal(url.searchParams.get("lang"), language);
+      assert.equal(url.origin, "https://example.com");
+      assert(url.pathname.startsWith("/portfolio/"));
+      await access(path.join(site, url.pathname.split("/").pop()));
+    }
+  }
+  assert(
+    vm.runInContext(
+      'filterSiteMap("KILC").some(group=>group.id==="cases")',
+      behavior,
+    ),
+  );
+  assert.equal(
+    vm.runInContext('filterSiteMap("not-a-present-page").length', behavior),
+    0,
+  );
+  Object.assign(state.location, {
+    href: `https://example.com/portfolio/services.html?lang=${language}&email=private%40example.com&token=secret#/services/seo`,
+    search: `?lang=${language}&email=private%40example.com&token=secret`,
+    pathname: "/portfolio/services.html",
+    hash: "#/services/seo",
+  });
+  assert.equal(
+    vm.runInContext("cleanInquiryPage()", behavior),
+    `https://example.com/portfolio/services.html?lang=${language}#/services/seo`,
+  );
+  const href = vm.runInContext('inquiryLink("seo")', behavior);
+  const formUrl = new URL(href, "https://example.com/portfolio/");
+  assert.equal(
+    formUrl.searchParams.get("from"),
+    `services.html?lang=${language}#/services/seo`,
+  );
+  Object.assign(state.location, {
+    href: formUrl.href,
+    search: formUrl.search,
+    pathname: formUrl.pathname,
+    hash: formUrl.hash,
+  });
+  const draft = vm.runInContext("composeInquiry(formValues)", behavior);
+  assert(
+    draft.includes(`https://example.com/portfolio/index.html?lang=${language}`),
+  );
+  assert(
+    draft.includes(
+      `https://example.com/portfolio/services.html?lang=${language}#/services/seo`,
+    ),
+  );
+  assert(!draft.includes("secret") && !draft.includes("private@"));
+  state.testDraft = draft;
+  for (const channel of ["whatsapp", "telegram"]) {
+    assert.equal(
+      new URL(
+        vm.runInContext(`messengerLink("${channel}", testDraft)`, behavior),
+      ).searchParams.get("text"),
+      draft,
+    );
+  }
+}
+for (const value of [
+  "https://outside.example/portfolio/services.html",
+  "javascript:alert(1)",
+  "../private.html",
+  "https://user:password@example.com/portfolio/index.html",
+  "https://example.com/other/index.html",
+]) {
+  state.sourceCandidate = value;
+  assert.equal(
+    vm.runInContext("cleanInquiryPage(sourceCandidate)", behavior),
+    "",
+  );
+}
+state.location.search = "?from=";
+assert.equal(vm.runInContext("inquiryPageContext().from", behavior), "");
+state.location.href =
+  "https://example.com/portfolio/blog-post.html?lang=ru&post=measurement-plan&phone=123#plan";
+assert.equal(
+  vm.runInContext("cleanInquiryPage()", behavior),
+  "https://example.com/portfolio/blog-post.html?lang=ru&post=measurement-plan",
+);
+const known404 = await readFile(path.join(site, "404.html"), "utf8");
+assert(
+  known404.includes('base href="/portfolio/"') &&
+    known404.includes("PORTFOLIO_NOT_FOUND = true"),
+);
+console.log(
+  "Checked utility pages, complete site directory and sanitized inquiry attribution in both messengers and languages.",
 );

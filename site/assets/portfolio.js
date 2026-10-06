@@ -38,9 +38,86 @@ function isClientsPage() {
   return location.pathname.endsWith("/clients.html");
 }
 
+const SITE_ENTRY_FILES = [
+  "index.html",
+  "services.html",
+  "cases.html",
+  "clients.html",
+  "pricing.html",
+  "reviews.html",
+  "about.html",
+  "blog.html",
+  "blog-category.html",
+  "blog-post.html",
+  "privacy.html",
+  "cookies.html",
+  "terms.html",
+  "site-map.html",
+  "404.html",
+];
+// Only public routing fields belong in a message. Never copy arbitrary URL parameters.
+function cleanInquiryPage(value = location.href) {
+  try {
+    const base = new URL(
+      ".",
+      window.PORTFOLIO_NOT_FOUND ? document.baseURI : location.href,
+    );
+    const url = new URL(value, base);
+    const file = url.pathname.split("/").pop() || "index.html";
+    if (
+      url.origin !== base.origin ||
+      url.username ||
+      url.password ||
+      new URL(".", url).pathname !== base.pathname ||
+      !SITE_ENTRY_FILES.includes(file)
+    )
+      return "";
+    const clean = new URL(file, base);
+    const language = url.searchParams.get("lang");
+    if (["ru", "en"].includes(language))
+      clean.searchParams.set("lang", language);
+    for (const [page, key] of [
+      ["blog-post.html", "post"],
+      ["blog-category.html", "category"],
+    ]) {
+      const id = url.searchParams.get(key);
+      if (file === page && /^[a-z0-9-]{1,100}$/.test(id || ""))
+        clean.searchParams.set(key, id);
+    }
+    if (file === "services.html" && /^#\/services\/[a-z0-9-]+$/.test(url.hash))
+      clean.hash = url.hash;
+    if (file === "cases.html" && /^#\/cases\/[a-z0-9-]+$/.test(url.hash))
+      clean.hash = url.hash;
+    return clean.href;
+  } catch {
+    return "";
+  }
+}
+function inquiryPageContext() {
+  const page = cleanInquiryPage(
+    window.PORTFOLIO_NOT_FOUND ? "404.html" : location.href,
+  );
+  const rawFrom = new URLSearchParams(location.search).get("from");
+  const from = rawFrom?.trim() ? cleanInquiryPage(rawFrom) : "";
+  return { page, from: from && from !== page ? from : "" };
+}
+
 function readRoute() {
   const segments = location.hash.slice(1).split("/").filter(Boolean);
   const file = location.pathname.split("/").pop();
+  const utilityPages = {
+    "privacy.html": "privacy",
+    "cookies.html": "cookies",
+    "terms.html": "terms",
+    "site-map.html": "site-map",
+    "404.html": "not-found",
+  };
+  if (window.PORTFOLIO_NOT_FOUND || utilityPages[file])
+    return {
+      page: window.PORTFOLIO_NOT_FOUND ? "not-found" : utilityPages[file],
+      service: "search-ads",
+      caseId: "ecom-us",
+    };
   const blogPages = {
     "blog.html": "blog",
     "blog-category.html": "blog-category",
@@ -421,6 +498,11 @@ function PortfolioRoot() {
         route.page.startsWith("blog") && typeof blogMetadata === "function"
           ? blogMetadata(route.page)
           : null;
+      const utilityMeta =
+        typeof utilityMetadata === "function"
+          ? utilityMetadata(route.page)
+          : null;
+      const pageMeta = utilityMeta || blogMeta;
       let title = translateText("Google Ads, SEO and web development");
       if (route.page === "clients") title = translateText("All clients");
       if (route.page === "services-index")
@@ -438,9 +520,9 @@ function PortfolioRoot() {
       if (route.page === "case")
         title = translateText(visibleCase(route.caseId)?.title || "Cases");
       document.title =
-        (blogMeta?.title || title) + " — " + window.PORTFOLIO.name;
-      document.querySelector('meta[name="description"]').content = blogMeta
-        ? blogMeta.description
+        (pageMeta?.title || title) + " — " + window.PORTFOLIO.name;
+      document.querySelector('meta[name="description"]').content = pageMeta
+        ? pageMeta.description
         : route.page === "about"
           ? profileCopy(window.ABOUT_PROFILE.intro)
           : route.page === "reviews"

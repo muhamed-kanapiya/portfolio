@@ -31,8 +31,11 @@ http
       });
       res.end(await readFile(target));
     } catch {
-      res.writeHead(404);
-      res.end("Not found");
+      res.writeHead(404, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(await readFile(path.join(root, "404.html")));
     }
   })
   .listen(port, "127.0.0.1", () =>

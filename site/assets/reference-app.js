@@ -2149,12 +2149,17 @@ function Ni() {
       e === "blog" && i(BlogArchivePage, {}),
       e === "blog-category" && i(BlogArchivePage, { categoryPage: true }),
       e === "blog-post" && i(BlogPostPage, {}),
+      ["privacy", "cookies", "terms"].includes(e) &&
+        i(UtilityPage, { kind: e }),
+      e === "site-map" && i(SiteMapPage, {}),
+      e === "not-found" && i(NotFoundPage, {}),
       e === "services-index" && i(ArchivePage, { kind: "services" }),
       e === "cases-index" && i(ArchivePage, { kind: "cases" }),
       e === "service" && i(ServiceDetail, { service: w(n) }),
       e === "case" && i(CaseDetail, { record: P(l) }),
       i(SiteFooter, {}),
       i(FloatingContacts, {}),
+      i(BackToTop, {}),
     ],
   });
 }

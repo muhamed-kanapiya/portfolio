@@ -63,7 +63,13 @@ function MegaServiceGroup({ group, mobile, onNavigate }) {
                     "aria-hidden": true,
                     children: service.emoji,
                   }),
-                  i("span", { children: service.title }),
+                  i("span", {
+                    className: "mega-link-copy",
+                    children: [
+                      i("strong", { children: service.title }),
+                      i("small", { children: service.short }),
+                    ],
+                  }),
                 ],
               }),
             },

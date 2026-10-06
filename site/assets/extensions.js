@@ -51,6 +51,11 @@ function inquiryLink(service = "", plan = "", packageName = "") {
   if (service) params.set("service", service);
   if (plan) params.set("plan", plan);
   if (packageName) params.set("package", packageName);
+  const source = cleanInquiryPage();
+  if (source && !new URL(source).pathname.endsWith("/index.html")) {
+    const url = new URL(source);
+    params.set("from", url.pathname.split("/").pop() + url.search + url.hash);
+  }
   return "index.html?" + params.toString() + "#contact";
 }
 function detailLink(kind, id) {
@@ -833,6 +838,16 @@ function composeInquiry(
     ru ? "Задача:" : "Message:",
     values.message.trim(),
   );
+  const context = inquiryPageContext();
+  if (context.page)
+    lines.push(
+      "",
+      `${ru ? "Страница заявки" : "Inquiry page"}: ${context.page}`,
+    );
+  if (context.from)
+    lines.push(
+      `${ru ? "Переход к форме" : "Opened form from"}: ${context.from}`,
+    );
   return lines.join("\n");
 }
 function messengerLink(channel, message) {
@@ -1064,6 +1079,16 @@ function InquiryForm() {
         children:
           "The messenger opens a draft. Review it and press Send there.",
       }),
+      i("p", {
+        className: "form-help form-privacy",
+        children: [
+          "The message includes the page address. ",
+          i("a", {
+            href: pageLink("privacy.html"),
+            children: "How your data is used ↗",
+          }),
+        ],
+      }),
       i("p", { className: "form-status", role: "status", children: status }),
     ],
   });
@@ -1112,7 +1137,6 @@ function SiteFooter() {
                   }),
                 ],
               }),
-              i(FooterSocials, {}),
               i("p", {
                 className: "contact-location",
                 children:
@@ -1125,27 +1149,13 @@ function SiteFooter() {
           i(InquiryForm, {}),
         ],
       }),
+      i(FooterDirectory, {}),
+      i(FooterSurprise, {}),
       i("div", {
         className: "page-container footer-bottom",
         children: [
           i("span", {
             children: "© " + new Date().getFullYear() + " Ads by Kanapiya",
-          }),
-          i("nav", {
-            "aria-label": translateText("Menu"),
-            children: [
-              i("a", { href: pageLink("services.html"), children: "Services" }),
-              publishedCases().length
-                ? i("a", {
-                    href: pageLink("cases.html"),
-                    children: "Case studies",
-                  })
-                : null,
-              i("a", { href: pageLink("clients.html"), children: "Clients" }),
-              i("a", { href: pageLink("pricing.html"), children: "Pricing" }),
-              i("a", { href: pageLink("reviews.html"), children: "Reviews" }),
-              i("a", { href: pageLink("about.html"), children: "About me" }),
-            ],
           }),
           i("span", { children: "Google Ads · SEO · Web · Analytics" }),
         ],
