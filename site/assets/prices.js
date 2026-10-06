@@ -434,6 +434,37 @@ window.PRICES = {
         KZT: null,
       },
     },
+    // New service prices are entered manually; null displays "On request".
+    "meta-ads": {
+      Audit: { USD: null, RUB: null, KZT: null },
+      Setup: { USD: null, RUB: null, KZT: null },
+      Management: { USD: null, RUB: null, KZT: null },
+    },
+    shopify: {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    insales: {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    training: {
+      "Individual training": { USD: null, RUB: null, KZT: null },
+      "Group training": { USD: null, RUB: null, KZT: null },
+      "Corporate training": { USD: null, RUB: null, KZT: null },
+    },
+    "crm-integrations": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "python-scraping": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
     "aeo-geo-ai": {
       Assessment: {
         USD: null,

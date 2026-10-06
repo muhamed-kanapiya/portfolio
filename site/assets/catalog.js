@@ -5,11 +5,12 @@ function catalogTranslation(en, ru) {
 }
 window.SERVICE_CATEGORIES = [
   ["all", catalogTranslation("All services", "Все услуги")],
-  ["ads", "Google Ads"],
+  ["ads", catalogTranslation("Advertising", "Реклама")],
   ["seo", "SEO"],
   ["analytics", catalogTranslation("Analytics", "Аналитика")],
   ["web", catalogTranslation("Web development", "Веб-разработка")],
-  ["automation", "Python"],
+  ["automation", catalogTranslation("Automation & CRM", "Автоматизация и CRM")],
+  ["training", catalogTranslation("Training", "Обучение")],
   ["research", catalogTranslation("AEO / GEO & AI", "AEO / GEO и ИИ")],
 ];
 tu.forEach((item) => {
@@ -715,6 +716,665 @@ tu.push(
   ),
 );
 
+// New directions use the same detail pages, pricing table and inquiry form.
+// Each copy pair is [English, Russian]; package names also key prices.js.
+function extendedCatalogService(data) {
+  const copy = (pair) => catalogTranslation(...pair);
+  const service = extraService(
+    data.id,
+    data.category,
+    data.emoji,
+    copy(data.title),
+    copy(data.short),
+    copy(data.description),
+    data.deliverables.map(([title, description]) => [
+      copy(title),
+      copy(description),
+    ]),
+    copy(data.timeline),
+    [],
+  );
+  service.faq = data.faq.map(([question, answer]) => ({
+    q: copy(question),
+    a: copy(answer),
+  }));
+  if (data.process)
+    service.process = data.process.map(([title, description]) => ({
+      t: copy(title),
+      d: copy(description),
+    }));
+  if (data.pricing)
+    service.pricing = data.pricing.map(([name, timeline, audience]) => ({
+      pkg: copy(name),
+      timeline: copy(timeline),
+      bestFor: copy(audience),
+    }));
+  return service;
+}
+tu.push(
+  ...[
+    {
+      id: "meta-ads",
+      category: "ads",
+      emoji: "📣",
+      title: [
+        "Meta Ads / social advertising",
+        "Таргетированная реклама / Meta Ads",
+      ],
+      short: [
+        "Facebook and Instagram campaigns built around your goals",
+        "Реклама в Facebook и Instagram под задачи бизнеса",
+      ],
+      description: [
+        "Campaign setup and management in Meta Ads: audience research, creative hypotheses, lead generation and conversion measurement. We connect advertising with your website or lead forms and track the quality of inquiries.",
+        "Настройка и ведение Meta Ads: аудитории, гипотезы креативов, лидогенерация и измерение конверсий. Связываем рекламу с сайтом или лид-формами и отслеживаем качество обращений.",
+      ],
+      deliverables: [
+        [
+          ["Audience and offer", "Аудитория и предложение"],
+          [
+            "Review the product, customer needs and buying journey; plan audiences and campaign goals.",
+            "Изучаем продукт, потребности клиентов и путь к покупке; определяем аудитории и цели кампаний.",
+          ],
+        ],
+        [
+          ["Creative testing plan", "План тестирования креативов"],
+          [
+            "Prepare messaging, creative briefs and tests for feed, Stories and Reels placements.",
+            "Готовим сообщения, задания на креативы и тесты для ленты, Stories и Reels.",
+          ],
+        ],
+        [
+          ["Events and lead delivery", "События и передача лидов"],
+          [
+            "Check Pixel events and UTM tags; scope Conversions API and CRM delivery for the existing setup.",
+            "Проверяем события Pixel и UTM; оцениваем подключение Conversions API и передачу лидов в CRM для текущей системы.",
+          ],
+        ],
+        [
+          ["Campaign management", "Ведение кампаний"],
+          [
+            "Monitor costs and lead quality, compare creatives and audiences, and report on the next decisions.",
+            "Следим за расходами и качеством заявок, сравниваем креативы и аудитории, объясняем следующие решения в отчёте.",
+          ],
+        ],
+      ],
+      timeline: [
+        "After account and scope review",
+        "После проверки аккаунта и объёма",
+      ],
+      pricing: [
+        [
+          ["Audit", "Аудит"],
+          ["1–2 working days", "1–2 рабочих дня"],
+          [
+            "Review an existing Meta Ads account and priorities",
+            "Разбор текущего Meta Ads и приоритетов",
+          ],
+        ],
+        [
+          ["Setup", "Настройка"],
+          ["Agreed before launch", "Согласуем до запуска"],
+          [
+            "Launch campaigns, tracking and initial creative tests",
+            "Запуск кампаний, аналитики и первых тестов креативов",
+          ],
+        ],
+        [
+          ["Management", "Ведение"],
+          ["Monthly", "Ежемесячно"],
+          [
+            "Regular optimization, testing and reporting",
+            "Регулярная оптимизация, тесты и отчётность",
+          ],
+        ],
+      ],
+      process: [
+        [
+          ["Review the account and goals", "Изучить аккаунт и цели"],
+          [
+            "Check access, previous campaigns, the market and the conversion path.",
+            "Проверяем доступы, прошлые кампании, рынок и путь до конверсии.",
+          ],
+        ],
+        [
+          [
+            "Prepare measurement and creatives",
+            "Подготовить измерение и креативы",
+          ],
+          [
+            "Agree on events, the offer, ad materials and a testing budget.",
+            "Согласуем события, предложение, рекламные материалы и бюджет тестов.",
+          ],
+        ],
+        [
+          ["Launch and check delivery", "Запустить и проверить заявки"],
+          [
+            "Test landing pages or forms and verify that leads reach the responsible person.",
+            "Тестируем посадочные страницы или формы и проверяем, что заявки доходят ответственному.",
+          ],
+        ],
+        [
+          ["Optimize using lead quality", "Оптимизировать по качеству лидов"],
+          [
+            "Use campaign data and sales feedback to prioritize the next tests.",
+            "По данным кампаний и обратной связи отдела продаж выбираем следующие тесты.",
+          ],
+        ],
+      ],
+      faq: [
+        [
+          [
+            "Is the Meta ad budget included?",
+            "Бюджет Meta Ads входит в стоимость?",
+          ],
+          [
+            "Advertising spend is separate. We agree on the service fee, test budget and any creative production before launch.",
+            "Рекламный бюджет оплачивается отдельно. Стоимость работы, тестов и производства креативов согласуем до запуска.",
+          ],
+        ],
+        [
+          ["Can you work without a website?", "Можно без сайта?"],
+          [
+            "We can scope lead forms or messaging campaigns. The choice depends on the product, market and how you handle inquiries.",
+            "Можем рассмотреть лид-формы или кампании для сообщений. Выбор зависит от продукта, рынка и обработки обращений.",
+          ],
+        ],
+        [
+          [
+            "What do you need to start Meta Ads?",
+            "Что нужно для старта Meta Ads?",
+          ],
+          [
+            "Access to the business assets, product information, creative materials and a way to evaluate lead quality. We first check account and market availability.",
+            "Доступ к бизнес-активам, информация о продукте, материалы и способ оценивать качество лидов. Сначала проверяем доступность аккаунта и рынка.",
+          ],
+        ],
+      ],
+    },
+    {
+      id: "shopify",
+      category: "web",
+      emoji: "🛍️",
+      title: ["Shopify", "Shopify"],
+      short: [
+        "Launch and improve an online store on Shopify",
+        "Запуск и развитие интернет-магазина на Shopify",
+      ],
+      description: [
+        "Build or improve a Shopify store: storefront, catalog, product pages and the purchase journey. We scope migration, apps and analytics around the store’s market and operational needs.",
+        "Создание и доработка магазина Shopify: витрина, каталог, карточки товаров и путь к покупке. Планируем перенос данных, приложения и аналитику с учётом рынка и процессов магазина.",
+      ],
+      deliverables: [
+        [
+          ["Storefront and theme", "Витрина и тема"],
+          [
+            "Adapt the selected theme, navigation and key pages for desktop and mobile.",
+            "Адаптируем выбранную тему, навигацию и основные страницы для компьютеров и телефонов.",
+          ],
+        ],
+        [
+          ["Products and collections", "Товары и коллекции"],
+          [
+            "Prepare product imports, variants, collections and consistent product information.",
+            "Готовим импорт товаров, варианты, коллекции и единообразное заполнение карточек.",
+          ],
+        ],
+        [
+          ["Purchase journey", "Путь до покупки"],
+          [
+            "Configure available payment and delivery options and verify the order journey with test scenarios.",
+            "Настраиваем доступные варианты оплаты и доставки, проверяем оформление заказа по тестовым сценариям.",
+          ],
+        ],
+        [
+          ["SEO, analytics and apps", "SEO, аналитика и приложения"],
+          [
+            "Set up page metadata, redirects, purchase measurement and the agreed app integrations.",
+            "Настраиваем метаданные, редиректы, измерение покупок и согласованные интеграции приложений.",
+          ],
+        ],
+      ],
+      timeline: [
+        "Depends on the catalog and theme",
+        "Зависит от каталога и темы",
+      ],
+      faq: [
+        [
+          [
+            "Can you improve an existing Shopify store?",
+            "Можно доработать существующий Shopify?",
+          ],
+          [
+            "Yes. We can work on individual pages, the theme, catalog structure, apps or analytics after reviewing the current setup.",
+            "Да. Можем доработать отдельные страницы, тему, структуру каталога, приложения или аналитику после проверки текущих настроек.",
+          ],
+        ],
+        [
+          [
+            "Are Shopify subscriptions and apps included?",
+            "Подписка Shopify и приложения включены?",
+          ],
+          [
+            "The platform, paid themes and apps are paid separately. We agree on the required subscriptions before connecting them.",
+            "Платформа, платные темы и приложения оплачиваются отдельно. Нужные подписки согласуем до подключения.",
+          ],
+        ],
+        [
+          [
+            "Can you migrate an existing catalog?",
+            "Можно перенести существующий каталог?",
+          ],
+          [
+            "We first review an export sample, variants, images and URLs, then agree on the migration scope and checks.",
+            "Сначала проверяем пример выгрузки, варианты, изображения и URL, затем согласуем объём переноса и проверок.",
+          ],
+        ],
+      ],
+    },
+    {
+      id: "insales",
+      category: "web",
+      emoji: "🏬",
+      title: ["inSales", "inSales"],
+      short: [
+        "An inSales store ready for daily operations",
+        "Магазин на inSales для ежедневной работы",
+      ],
+      description: [
+        "Set up or improve an inSales store: design, catalog, ordering and connections to your existing systems. We prepare the storefront and explain how to manage products and orders.",
+        "Настройка и доработка магазина inSales: дизайн, каталог, оформление заказов и связи с вашими системами. Готовим витрину и объясняем, как управлять товарами и заказами.",
+      ],
+      deliverables: [
+        [
+          ["Theme and store structure", "Тема и структура магазина"],
+          [
+            "Adapt the design, navigation, category pages and mobile layout.",
+            "Адаптируем дизайн, навигацию, страницы категорий и мобильную версию.",
+          ],
+        ],
+        [
+          ["Catalog import and filters", "Импорт каталога и фильтры"],
+          [
+            "Prepare product properties, variants, categories, filters and import rules.",
+            "Готовим свойства товаров, варианты, категории, фильтры и правила импорта.",
+          ],
+        ],
+        [
+          ["Orders, payment and delivery", "Заказы, оплата и доставка"],
+          [
+            "Configure supported providers and notifications, then test the order workflow.",
+            "Настраиваем поддерживаемые сервисы и уведомления, затем проверяем обработку заказа.",
+          ],
+        ],
+        [
+          ["Store connections and measurement", "Связи магазина и измерение"],
+          [
+            "Scope inventory or CRM synchronization, SEO settings and ecommerce events.",
+            "Прорабатываем обмен с учётной системой или CRM, SEO-настройки и события электронной торговли.",
+          ],
+        ],
+      ],
+      timeline: [
+        "After catalog and integration review",
+        "После проверки каталога и интеграций",
+      ],
+      faq: [
+        [
+          [
+            "Can you customize an inSales theme?",
+            "Можно доработать тему inSales?",
+          ],
+          [
+            "Yes. We first inspect the theme and agree on the pages, mobile behavior and changes needed.",
+            "Да. Сначала изучаем тему и согласуем страницы, поведение на телефоне и нужные изменения.",
+          ],
+        ],
+        [
+          [
+            "Can you connect inventory or a CRM?",
+            "Можно подключить учётную систему или CRM?",
+          ],
+          [
+            "We check the available connectors and APIs, then agree on the fields, synchronization direction and update frequency.",
+            "Проверяем доступные коннекторы и API, затем согласуем поля, направление обмена и частоту обновления.",
+          ],
+        ],
+        [
+          [
+            "What is paid separately for inSales?",
+            "Что для inSales оплачивается отдельно?",
+          ],
+          [
+            "The platform subscription, paid themes and external services. Development costs are agreed after the scope review.",
+            "Подписка платформы, платные темы и внешние сервисы. Стоимость разработки согласуем после оценки задачи.",
+          ],
+        ],
+      ],
+    },
+    {
+      id: "training",
+      category: "training",
+      emoji: "🎓",
+      title: ["Training and mentoring", "Обучение и наставничество"],
+      short: [
+        "Individual, group and corporate training",
+        "Индивидуальное, групповое и корпоративное обучение",
+      ],
+      description: [
+        "Practical training in advertising, SEO, analytics and websites. We choose a topic and level, build the program around your goals and practice on a real project or a training example.",
+        "Практическое обучение рекламе, SEO, аналитике и работе с сайтами. Выбираем тему и уровень, составляем программу под ваши цели и отрабатываем навыки на реальном проекте или учебном примере.",
+      ],
+      deliverables: [
+        [
+          ["A program for your goal", "Программа под вашу цель"],
+          [
+            "Select Google Ads, Meta Ads, SEO, GA4 / GTM or website topics, with a starting-level assessment.",
+            "Выбираем темы Google Ads, Meta Ads, SEO, GA4 / GTM или работы с сайтами и определяем стартовый уровень.",
+          ],
+        ],
+        [
+          ["Practice and feedback", "Практика и обратная связь"],
+          [
+            "Work through tasks, review decisions and get feedback on completed exercises.",
+            "Разбираем задачи, обсуждаем решения и проверяем выполненные практические задания.",
+          ],
+        ],
+        [
+          ["Materials and checklists", "Материалы и чек-листы"],
+          [
+            "Receive lesson notes, practical checklists and resources for independent work.",
+            "Получаете конспекты, практические чек-листы и материалы для самостоятельной работы.",
+          ],
+        ],
+        [
+          ["Skills you can apply", "Навыки для вашей работы"],
+          [
+            "Finish with a practical task and a plan for applying the new skills to your project or team.",
+            "В конце выполняем практическую задачу и составляем план применения навыков в проекте или команде.",
+          ],
+        ],
+      ],
+      timeline: ["An agreed lesson schedule", "По согласованному расписанию"],
+      pricing: [
+        [
+          ["Individual training", "Индивидуальное обучение"],
+          ["Personal schedule", "Личное расписание"],
+          [
+            "One-to-one lessons and mentoring on your project",
+            "Занятия один на один и наставничество по вашему проекту",
+          ],
+        ],
+        [
+          ["Group training", "Групповое обучение"],
+          ["An agreed group schedule", "По расписанию группы"],
+          [
+            "A shared program, exercises and group discussions",
+            "Общая программа, практика и разборы в группе",
+          ],
+        ],
+        [
+          ["Corporate training", "Корпоративное обучение"],
+          ["A program for your team", "Программа под команду"],
+          [
+            "Workshops and training tailored to company workflows",
+            "Практикумы и обучение под процессы компании",
+          ],
+        ],
+      ],
+      process: [
+        [
+          ["Define the learning goal", "Определить цель обучения"],
+          [
+            "Discuss the starting level, tasks and what participants should be able to do afterwards.",
+            "Обсуждаем исходный уровень, задачи и то, что участники должны уметь после обучения.",
+          ],
+        ],
+        [
+          ["Agree on the program and format", "Согласовать программу и формат"],
+          [
+            "Choose individual, group or corporate lessons; agree on topics, workload and schedule.",
+            "Выбираем индивидуальный, групповой или корпоративный формат, темы, нагрузку и расписание.",
+          ],
+        ],
+        [
+          ["Learn through practical tasks", "Учиться на практике"],
+          [
+            "Combine explanations with hands-on work, questions and feedback.",
+            "Совмещаем объяснения с практикой, ответами на вопросы и обратной связью.",
+          ],
+        ],
+        [
+          ["Apply the skills independently", "Применить навыки самостоятельно"],
+          [
+            "Review a final task and identify the next steps for the participant or team.",
+            "Разбираем итоговое задание и определяем следующие шаги для участника или команды.",
+          ],
+        ],
+      ],
+      faq: [
+        [
+          [
+            "Is the training suitable for beginners?",
+            "Обучение подойдёт новичкам?",
+          ],
+          [
+            "Yes. The starting level is discussed before the program is prepared. Experienced participants can focus on specific tasks or account reviews.",
+            "Да. Стартовый уровень обсуждаем до подготовки программы. Для опытных участников можем сосредоточиться на конкретных задачах и разборах аккаунтов.",
+          ],
+        ],
+        [
+          [
+            "How do the three training formats differ?",
+            "Чем отличаются три формата обучения?",
+          ],
+          [
+            "Individual lessons follow your pace and project. A group follows a shared program. Corporate training is built around a team’s roles and company workflows.",
+            "Индивидуальные занятия учитывают ваш темп и проект. Группа проходит общую программу. Корпоративное обучение строится вокруг ролей команды и процессов компании.",
+          ],
+        ],
+        [
+          [
+            "How long does training take and what does it cost?",
+            "Сколько длится и стоит обучение?",
+          ],
+          [
+            "It depends on the topic, number of participants, starting level and practical workload. We agree on the program, lesson count and fee before starting.",
+            "Зависит от темы, количества участников, уровня и объёма практики. Программу, число занятий и стоимость согласуем до начала.",
+          ],
+        ],
+      ],
+    },
+    {
+      id: "crm-integrations",
+      category: "automation",
+      emoji: "🔗",
+      title: ["Integrations and CRM", "Интеграции и CRM"],
+      short: [
+        "Connect websites, inquiries and the sales workflow",
+        "Связываем сайт, заявки и работу отдела продаж",
+      ],
+      description: [
+        "Connect forms, stores and advertising sources to your CRM. Configure lead delivery, field mapping and routine automation so the team can follow an inquiry from its source to the next action.",
+        "Связываем формы, магазины и рекламные источники с CRM. Настраиваем передачу лидов, соответствие полей и автоматизацию рутинных действий, чтобы команда видела источник заявки и следующий шаг.",
+      ],
+      deliverables: [
+        [
+          ["Workflow and field mapping", "Процессы и карта полей"],
+          [
+            "Define the lead stages, required fields, responsible roles and data sources.",
+            "Определяем этапы работы с лидом, обязательные поля, ответственных и источники данных.",
+          ],
+        ],
+        [
+          ["Lead and order delivery", "Передача заявок и заказов"],
+          [
+            "Connect agreed forms and systems using supported integrations, webhooks or APIs.",
+            "Подключаем согласованные формы и системы через поддерживаемые интеграции, вебхуки или API.",
+          ],
+        ],
+        [
+          ["Automation and notifications", "Автоматизация и уведомления"],
+          [
+            "Set up agreed task creation, notifications and duplicate-handling rules.",
+            "Настраиваем согласованные задачи, уведомления и правила обработки дублей.",
+          ],
+        ],
+        [
+          ["Source tracking and diagnostics", "Источники и диагностика"],
+          [
+            "Preserve UTM data, test delivery failures and document the integration for the team.",
+            "Сохраняем UTM, проверяем ошибки доставки и документируем интеграцию для команды.",
+          ],
+        ],
+      ],
+      timeline: [
+        "After workflow and API review",
+        "После проверки процессов и API",
+      ],
+      faq: [
+        [
+          ["Which CRM can you integrate?", "Какую CRM можно подключить?"],
+          [
+            "Send the names of your CRM and connected services. We check their available APIs, connectors and plan restrictions before confirming the scope.",
+            "Пришлите названия CRM и сервисов. Перед подтверждением задачи проверим доступные API, коннекторы и ограничения тарифов.",
+          ],
+        ],
+        [
+          [
+            "Will existing CRM data be preserved?",
+            "Сохранятся текущие данные CRM?",
+          ],
+          [
+            "We review existing fields and workflows first, agree on changes and test them on sample records before rollout.",
+            "Сначала изучаем текущие поля и процессы, согласуем изменения и проверяем их на тестовых записях до запуска.",
+          ],
+        ],
+        [
+          [
+            "Are CRM subscriptions included?",
+            "Подписки CRM входят в стоимость?",
+          ],
+          [
+            "CRM licenses, paid connectors and hosting are separate. Required services and costs are agreed before implementation.",
+            "Лицензии CRM, платные коннекторы и хостинг оплачиваются отдельно. Нужные сервисы и расходы согласуем до реализации.",
+          ],
+        ],
+      ],
+    },
+    {
+      id: "python-scraping",
+      category: "automation",
+      emoji: "🕸️",
+      title: ["Python web scraping", "Парсинг на Python"],
+      short: [
+        "Structured data from websites and APIs",
+        "Структурированные данные из сайтов и API",
+      ],
+      description: [
+        "Collect product data, prices and other agreed information into a usable dataset. We start with a sample source, define the fields and build a repeatable collection and validation process.",
+        "Собираем товары, цены и другие согласованные данные в удобный набор. Начинаем с примера источника, определяем поля и создаём повторяемый процесс сбора и проверки.",
+      ],
+      deliverables: [
+        [
+          ["Source and sample review", "Источники и пробная выборка"],
+          [
+            "Check source structure, access conditions and the required fields, then show a small sample.",
+            "Проверяем структуру источника, условия доступа и нужные поля, затем показываем небольшую выборку.",
+          ],
+        ],
+        [
+          ["Collection and validation", "Сбор и проверка данных"],
+          [
+            "Implement pagination, normalization, duplicate removal and missing-field checks.",
+            "Реализуем обход страниц, нормализацию, удаление дублей и проверку пропущенных полей.",
+          ],
+        ],
+        [
+          ["Export in your format", "Выгрузка в вашем формате"],
+          [
+            "Deliver CSV, Excel or JSON, or scope a connection to your existing database or system.",
+            "Передаём CSV, Excel или JSON либо согласуем подключение к вашей базе или системе.",
+          ],
+        ],
+        [
+          ["Scheduling and maintenance", "Расписание и сопровождение"],
+          [
+            "Agree on refresh frequency, logs and how to handle source changes or failed runs.",
+            "Согласуем частоту обновления, журналы и обработку изменений источника или неудачных запусков.",
+          ],
+        ],
+      ],
+      timeline: [
+        "After checking a source sample",
+        "После проверки примера источника",
+      ],
+      process: [
+        [
+          ["Specify sources and fields", "Определить источники и поля"],
+          [
+            "Agree on URLs, data fields, volume, access and the delivery format.",
+            "Согласуем URL, поля, объём, доступ и формат результата.",
+          ],
+        ],
+        [
+          ["Approve a sample export", "Согласовать пробную выгрузку"],
+          [
+            "Collect a small sample so you can check the structure and usefulness of the data.",
+            "Собираем небольшую выборку, чтобы вы проверили структуру и полезность данных.",
+          ],
+        ],
+        [
+          ["Build and validate collection", "Настроить сбор и проверку"],
+          [
+            "Implement the script, validate records and report missing or inconsistent data.",
+            "Разрабатываем скрипт, проверяем записи и показываем пропуски или несоответствия.",
+          ],
+        ],
+        [
+          ["Deliver data and instructions", "Передать данные и инструкции"],
+          [
+            "Hand over the export and agreed code, with launch instructions and update requirements.",
+            "Передаём выгрузку и согласованный код, инструкции запуска и требования к обновлению.",
+          ],
+        ],
+      ],
+      faq: [
+        [
+          [
+            "What should I send for a scraping estimate?",
+            "Что прислать для оценки парсинга?",
+          ],
+          [
+            "Example URLs, the fields you need, the approximate volume, update frequency and a desired output sample.",
+            "Примеры URL, нужные поля, примерный объём, частоту обновления и образец желаемой таблицы.",
+          ],
+        ],
+        [
+          [
+            "Can the scraper run regularly?",
+            "Можно запускать парсер регулярно?",
+          ],
+          [
+            "Yes. We agree on the runtime environment and schedule. Website changes can require maintenance; this is scoped separately.",
+            "Да. Согласуем среду запуска и расписание. Изменения сайта могут потребовать доработок; сопровождение оценивается отдельно.",
+          ],
+        ],
+        [
+          [
+            "What if a source has access restrictions?",
+            "Что делать, если источник ограничивает доступ?",
+          ],
+          [
+            "We first check the available API, exports or authorized access. Feasibility and limits are agreed from a source sample before development.",
+            "Сначала проверяем API, выгрузки или разрешённый доступ. Возможность и ограничения сбора согласуем на примере источника до разработки.",
+          ],
+        ],
+      ],
+    },
+  ].map(extendedCatalogService),
+);
+
 // Original reference cases are also examples, not evidence of work for named clients.
 Nn.forEach((item) => {
   item.demo = true;
@@ -1396,6 +2056,11 @@ Object.assign(window.RU, {
 });
 
 window.RU["Account review and priorities"] = "Аудит и приоритеты";
+window.RU["Training format"] = "Формат обучения";
+window.RU["Help me choose a format"] = "Помогите выбрать формат";
+window.RU[
+  "The final scope, schedule and price are agreed before work starts."
+] = "Итоговый объём, расписание и стоимость согласуем до начала работы.";
 
 Object.assign(window.RU, {
   "Prices are set separately for each currency.":

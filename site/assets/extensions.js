@@ -46,10 +46,11 @@ function planPeriod(plan, language = currentLanguage) {
       : "")
   );
 }
-function inquiryLink(service = "", plan = "") {
+function inquiryLink(service = "", plan = "", packageName = "") {
   const params = new URLSearchParams({ lang: currentLanguage });
   if (service) params.set("service", service);
   if (plan) params.set("plan", plan);
+  if (packageName) params.set("package", packageName);
   return "index.html?" + params.toString() + "#contact";
 }
 function detailLink(kind, id) {
@@ -238,14 +239,17 @@ function ServiceCard({ service }) {
 function ServicesSection() {
   const featured = [
     "google-ads",
+    "meta-ads",
     "seo",
     "tracking",
     "web-development",
     "wordpress",
     "tilda",
+    "shopify",
     "react",
     "python",
     "aeo-geo-ai",
+    "training",
   ].map((id) => tu.find((item) => item.id === id));
   return i("section", {
     id: "services",
@@ -579,7 +583,21 @@ function ServiceDetail({ service }) {
                               "tr",
                               {
                                 children: [
-                                  i("th", { scope: "row", children: item.pkg }),
+                                  i("th", {
+                                    scope: "row",
+                                    children:
+                                      service.id === "training"
+                                        ? i("a", {
+                                            className: "author-text-link",
+                                            href: inquiryLink(
+                                              service.id,
+                                              "",
+                                              item.pkg,
+                                            ),
+                                            children: item.pkg,
+                                          })
+                                        : item.pkg,
+                                  }),
                                   i("td", { children: item.timeline }),
                                   i("td", {
                                     className: "fee-cell",
@@ -600,7 +618,9 @@ function ServiceDetail({ service }) {
                   i("p", {
                     className: "small-note",
                     children:
-                      "Advertising spend is separate. The final scope and price are agreed before work starts.",
+                      service.category === "ads"
+                        ? "Advertising spend is separate. The final scope and price are agreed before work starts."
+                        : "The final scope, schedule and price are agreed before work starts.",
                   }),
                 ],
               }),
@@ -873,6 +893,10 @@ function composeInquiry(
   const translate = (value) => (ru ? window.RU[value?.trim()] || value : value);
   const service = tu.find((item) => item.id === values.service);
   const plan = PLAN_DEFINITIONS.find((item) => item.id === values.plan);
+  const trainingFormat =
+    service?.id === "training"
+      ? service.pricing.find((item) => item.pkg === values.package)
+      : null;
   const lines = [
     ru ? "Новая заявка — Ads by Kanapiya" : "New inquiry — Ads by Kanapiya",
     `${ru ? "Имя" : "Name"}: ${values.name.trim()}`,
@@ -884,6 +908,10 @@ function composeInquiry(
   if (plan)
     lines.push(
       `${ru ? "Тариф" : "Plan"}: ${translate(plan.name)} · ${money(window.PRICES.plans[plan.id], currency, language)} · ${planPeriod(plan, language)}`,
+    );
+  if (trainingFormat)
+    lines.push(
+      `${ru ? "Формат" : "Format"}: ${translate(trainingFormat.pkg)} · ${money(servicePrices(service.id, trainingFormat.pkg), currency, language)}`,
     );
   lines.push(
     `${ru ? "Валюта" : "Currency"}: ${currency}`,
@@ -914,6 +942,13 @@ function InquiryForm() {
       ? params.get("service")
       : "",
     plan: params.get("plan") || "",
+    package:
+      params.get("service") === "training" &&
+      tu
+        .find((item) => item.id === "training")
+        ?.pricing.some((item) => item.pkg === params.get("package"))
+        ? params.get("package")
+        : "",
     name: "",
     contact: "",
     website: "",
@@ -931,7 +966,7 @@ function InquiryForm() {
     setValues((previous) => ({
       ...previous,
       [name]: value,
-      ...(name === "service" ? { plan: "" } : {}),
+      ...(name === "service" ? { plan: "", package: "" } : {}),
     }));
     setStatus("");
   };
@@ -1000,6 +1035,35 @@ function InquiryForm() {
               }),
             ],
           }),
+          values.service === "training"
+            ? i("label", {
+                className: "form-field form-wide",
+                children: [
+                  i("span", { children: "Training format" }),
+                  i("select", {
+                    name: "package",
+                    "aria-label": translateText("Training format"),
+                    value: values.package || "",
+                    onChange: update,
+                    children: [
+                      i("option", {
+                        value: "",
+                        children: "Help me choose a format",
+                      }),
+                      ...tu
+                        .find((item) => item.id === "training")
+                        .pricing.map((item) =>
+                          i(
+                            "option",
+                            { value: item.pkg, children: item.pkg },
+                            item.pkg,
+                          ),
+                        ),
+                    ],
+                  }),
+                ],
+              })
+            : null,
           field("Your name", "name", {
             required: true,
             minLength: 2,

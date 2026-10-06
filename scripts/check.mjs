@@ -161,11 +161,11 @@ vm.runInContext(
   behavior,
 );
 
-assert.equal(vm.runInContext("tu.length", behavior), 25);
+assert.equal(vm.runInContext("tu.length", behavior), 31);
 assert.equal(vm.runInContext("Nn.length", behavior), 14);
 assert.equal(
   vm.runInContext("new Set(tu.map(item=>item.id)).size", behavior),
-  25,
+  31,
 );
 assert.equal(
   vm.runInContext("new Set(Nn.map(item=>item.id)).size", behavior),
@@ -264,7 +264,7 @@ for (const language of ["ru", "en"]) {
   }
 }
 console.log(
-  "Checked 25 services, 14 demo cases, 28 clients, archive routes, independent USD/RUB/KZT prices and both messenger drafts in RU/EN.",
+  "Checked 31 services, 14 demo cases, 28 clients, archive routes, independent USD/RUB/KZT prices and both messenger drafts in RU/EN.",
 );
 
 // Exercise the actual submit handler without opening or sending anything externally.
@@ -544,6 +544,86 @@ vm.runInContext(
   behavior,
 );
 vm.runInContext('currentLanguage="ru"; currentCurrency="USD"', behavior);
+// New directions must resolve through the same catalog, translated price search and inquiry flow.
+const addedServiceIds = [
+  "meta-ads",
+  "shopify",
+  "insales",
+  "training",
+  "crm-integrations",
+  "python-scraping",
+];
+for (const serviceId of addedServiceIds) {
+  const service = vm.runInContext(
+    `tu.find(item=>item.id==="${serviceId}")`,
+    behavior,
+  );
+  assert(
+    service &&
+      state.window.SERVICE_CATEGORIES.some(([id]) => id === service.category),
+  );
+  for (const text of [
+    service.title,
+    service.short,
+    service.long,
+    ...service.deliverables.flatMap((item) => [item.title, item.desc]),
+    ...service.faq.flatMap((item) => [item.q, item.a]),
+  ]) {
+    assert(
+      state.window.RU[text],
+      `Missing Russian copy for ${serviceId}: ${text}`,
+    );
+  }
+}
+for (const query of ["корпоративное обучение", "corporate training"]) {
+  const rows = vm.runInContext(
+    `filteredPriceRows({query:${JSON.stringify(query)},category:"training"})`,
+    behavior,
+  );
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].pkg.pkg, "Corporate training");
+}
+for (const language of ["ru", "en"]) {
+  vm.runInContext(`currentLanguage="${language}"`, behavior);
+  for (const format of [
+    "Individual training",
+    "Group training",
+    "Corporate training",
+  ]) {
+    state.trainingInquiry = {
+      name: "Example",
+      contact: "test@example.com",
+      service: "training",
+      package: format,
+      plan: "",
+      website: "",
+      message: "Training for the team",
+    };
+    const text = vm.runInContext("composeInquiry(trainingInquiry)", behavior);
+    assert(
+      text.includes(
+        language === "ru"
+          ? "Формат: " + state.window.RU[format]
+          : "Format: " + format,
+      ),
+    );
+    const link = new URL(
+      vm.runInContext(
+        `inquiryLink("training","",${JSON.stringify(format)})`,
+        behavior,
+      ),
+      "https://example.com/portfolio/",
+    );
+    assert.equal(link.searchParams.get("package"), format);
+    state.trainingInquiry.service = "seo";
+    assert(
+      !vm
+        .runInContext("composeInquiry(trainingInquiry)", behavior)
+        .includes(language === "ru" ? "Формат:" : "Format:"),
+    );
+  }
+}
+vm.runInContext('currentLanguage="ru"', behavior);
 assert.equal(
   vm.runInContext("priceCatalogRows().length", behavior),
   vm.runInContext("tu.reduce((sum,item)=>sum+item.pricing.length,0)", behavior),
