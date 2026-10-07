@@ -217,6 +217,36 @@ window.ABOUT_PROFILE = {
   // Add only real profile URLs. Messenger contacts stay in config.js.
   socialLinks: [
     {
+      id: "instagram",
+      icon: "instagram",
+      name: "Instagram",
+      handle: "@qazaq.biz",
+      url: "https://www.instagram.com/qazaq.biz/",
+      description: { ru: "Мой профиль", en: "My profile" },
+    },
+    {
+      id: "threads",
+      icon: "threads",
+      name: "Threads",
+      handle: "@qazaq.biz",
+      url: "https://www.threads.com/@qazaq.biz",
+      description: {
+        ru: "Заметки и обсуждения",
+        en: "Notes and conversations",
+      },
+    },
+    {
+      id: "youtube",
+      icon: "youtube",
+      name: "YouTube",
+      handle: "@kanapiyakz",
+      url: "https://www.youtube.com/channel/UCJwKLR01fOFkSr0jZU3mPCA/",
+      description: {
+        ru: "Nomad Walks Kazakhstan",
+        en: "Nomad Walks Kazakhstan",
+      },
+    },
+    {
       id: "telegram-channel",
       icon: "telegram",
       name: "Telegram",

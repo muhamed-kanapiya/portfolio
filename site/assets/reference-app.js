@@ -2146,6 +2146,15 @@ function Ni() {
       e === "pricing" && i(PricingPage, {}),
       e === "reviews" && i(ReviewsPage, {}),
       e === "about" && i(AboutPage, {}),
+      e === "courses" && i(CoursesPage, {}),
+      e === "course" && i(CoursePage, {}),
+      e === "academy" && i(AcademyPage, {}),
+      e === "classroom" && i(ClassroomPage, {}),
+      e === "exam" && i(ExamPage, {}),
+      e === "materials" && i(MaterialsPage, {}),
+      e === "material" && i(MaterialPage, {}),
+      e === "travel" && i(TravelPage, {}),
+      e === "video" && i(VideoPage, {}),
       e === "ai" && i(AIPage, {}),
       e === "cities" && i(CitiesPage, {}),
       e === "city" && i(CityPage, {}),
@@ -2163,6 +2172,7 @@ function Ni() {
       i(SiteFooter, {}),
       i(FloatingContacts, {}),
       i(BackToTop, {}),
+      i(ResourceSlideIn, {}),
     ],
   });
 }

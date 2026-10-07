@@ -11,6 +11,15 @@ for (const filename of await readdir(path.join(site, "assets"))) {
     });
 }
 for (const page of [
+  "courses.html",
+  "course.html",
+  "academy.html",
+  "classroom.html",
+  "exam.html",
+  "materials.html",
+  "material.html",
+  "travel.html",
+  "video.html",
   "index.html",
   "clients.html",
   "services.html",
@@ -78,7 +87,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, twenty-two HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, thirty-one HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -989,6 +998,20 @@ console.log(
   "Checked menu service links, blog block structure, drafts, bilingual search, reading time and direct subpath URLs.",
 );
 
+for (const hubFile of [
+  "learning-data.js",
+  "resources-data.js",
+  "travel-data.js",
+  "learning.js",
+  "resources.js",
+  "travel.js",
+  "announcements.js",
+])
+  vm.runInContext(
+    await readFile(path.join(site, "assets", hubFile), "utf8"),
+    behavior,
+  );
+
 vm.runInContext(
   await readFile(path.join(site, "assets/utilities.js"), "utf8"),
   behavior,
@@ -1309,4 +1332,163 @@ assert.equal(changedPoint, 1);
 state.le = previousHooks;
 console.log(
   "Checked 8 AI offers, 5 city pages, bilingual source attribution and honest range/dated-chart validation.",
+);
+
+// Learning is deliberately a public demo. Validate progression inputs, scoring and content links.
+const allCourses = vm.runInContext("COURSES", behavior);
+const allResources = vm.runInContext("RESOURCES", behavior);
+const allVideos = vm.runInContext("TRAVEL_VIDEOS", behavior);
+assert.equal(vm.runInContext("LEARNING_MODE", behavior), "demo");
+assert.equal(
+  new Set(allCourses.map((item) => item.id)).size,
+  allCourses.length,
+);
+for (const course of allCourses) {
+  assert.equal(course.lessons.length, 6);
+  assert.equal(new Set(course.lessons.map((item) => item.id)).size, 6);
+  assert(
+    vm
+      .runInContext("tu", behavior)
+      .some((service) => service.id === course.serviceId),
+  );
+  const exam = vm.runInContext(
+    "COURSE_EXAMS[" + JSON.stringify(course.id) + "]",
+    behavior,
+  );
+  assert.equal(exam.length, 6);
+  for (const question of [
+    ...course.lessons.map((lesson) => lesson.quiz),
+    ...exam,
+  ]) {
+    assert(question.question.ru && question.question.en);
+    assert.equal(question.options.length, 3);
+    assert(
+      Number.isInteger(question.answer) &&
+        question.answer >= 0 &&
+        question.answer < 3,
+    );
+    assert(question.explanation.ru && question.explanation.en);
+    question.options.forEach((option) => assert(option.ru && option.en));
+  }
+  for (const lesson of course.lessons)
+    for (const language of ["ru", "en"]) {
+      assert(lesson.body[language].length > 180);
+      assert(lesson.example[language].length > 50);
+      assert(lesson.practice[language].length > 50);
+    }
+  const correct = exam.map((question) => question.answer);
+  const score = (answers) =>
+    vm.runInContext(
+      "scoreCourseExam(" +
+        JSON.stringify(course.id) +
+        "," +
+        JSON.stringify(answers) +
+        ")",
+      behavior,
+    );
+  assert.equal(score(correct).percent, 100);
+  assert.equal(score(correct).passed, true);
+  assert.equal(score(correct.slice(0, 5)), null);
+  assert.equal(score(correct.map(() => -1)), null);
+  assert.equal(score(correct.map(String)), null);
+  const five = [...correct];
+  five[0] = (five[0] + 1) % 3;
+  assert.equal(score(five).passed, true);
+  const four = [...five];
+  four[1] = (four[1] + 1) % 3;
+  assert.equal(score(four).passed, false);
+  course.resourceIds.forEach((id) =>
+    assert(allResources.some((resource) => resource.id === id)),
+  );
+}
+const cleanedProgress = vm.runInContext(
+  'cleanLearningState({"google-ads":{enrolled:true,completed:["economics","economics","fake"],best:999,attempts:-2},unknown:{enrolled:true}})',
+  behavior,
+);
+assert.equal(Object.keys(cleanedProgress).length, 1);
+assert.equal(cleanedProgress["google-ads"].completed.join(","), "economics");
+assert.equal(cleanedProgress["google-ads"].best, null);
+assert.equal(cleanedProgress["google-ads"].attempts, 0);
+assert.equal(
+  Object.keys(vm.runInContext("cleanLearningState(null)", behavior)).length,
+  0,
+);
+assert.equal(
+  Object.keys(vm.runInContext("cleanLearningState([])", behavior)).length,
+  0,
+);
+for (const resource of allResources)
+  for (const language of ["ru", "en"]) {
+    const filename = vm.runInContext(
+      "resourceFile(RESOURCES.find(item=>item.id===" +
+        JSON.stringify(resource.id) +
+        ")," +
+        JSON.stringify(language) +
+        ")",
+      behavior,
+    );
+    const file = await readFile(path.join(site, filename));
+    assert(file.length > 1000);
+    assert.equal(
+      file.subarray(0, resource.format === "PDF" ? 4 : 2).toString(),
+      resource.format === "PDF" ? "%PDF" : "PK",
+    );
+    assert(allCourses.some((course) => course.id === resource.courseId));
+  }
+assert.equal(
+  new Set(allVideos.map((video) => video.id)).size,
+  allVideos.length,
+);
+allVideos.forEach((video) => {
+  assert(/^[A-Za-z0-9_-]{11}$/.test(video.id));
+  assert(video.title.ru && video.title.en);
+});
+for (const language of ["ru", "en"]) {
+  vm.runInContext("currentLanguage=" + JSON.stringify(language), behavior);
+  for (const [file, page, key, id] of [
+    ["courses.html", "courses"],
+    ["course.html", "course", "course", "google-ads"],
+    ["academy.html", "academy"],
+    ["classroom.html", "classroom", "course", "seo"],
+    ["exam.html", "exam", "course", "analytics"],
+    ["materials.html", "materials"],
+    ["material.html", "material", "resource", "ads-checklist"],
+    ["travel.html", "travel"],
+    ["video.html", "video", "video", "N-d9C90eDuM"],
+  ]) {
+    const search = "?lang=" + language + (key ? "&" + key + "=" + id : "");
+    Object.assign(state.location, {
+      origin: "https://example.com",
+      pathname: "/portfolio/" + file,
+      search,
+      hash: "",
+      href:
+        "https://example.com/portfolio/" +
+        file +
+        search +
+        "&token=secret&email=private",
+    });
+    assert.equal(vm.runInContext("readRoute().page", behavior), page);
+    const source = new URL(vm.runInContext("cleanInquiryPage()", behavior));
+    assert(
+      !source.searchParams.has("token") && !source.searchParams.has("email"),
+    );
+    if (key) assert.equal(source.searchParams.get(key), id);
+    assert(
+      vm.runInContext(
+        "hubMetadata(" + JSON.stringify(page) + ").title",
+        behavior,
+      ),
+    );
+    assert.equal(source.searchParams.get("lang"), language);
+  }
+}
+for (const filename of ["academy.html", "classroom.html", "exam.html"])
+  assert(
+    (await readFile(path.join(site, filename), "utf8")).includes(
+      "noindex, follow",
+    ),
+  );
+console.log(
+  "Checked 4 bilingual courses, 24 lessons, exam thresholds and malformed progress, 10 real downloads, 14 videos and sanitized course/resource/video links.",
 );

@@ -39,6 +39,15 @@ function isClientsPage() {
 }
 
 const SITE_ENTRY_FILES = [
+  "courses.html",
+  "course.html",
+  "academy.html",
+  "classroom.html",
+  "exam.html",
+  "materials.html",
+  "material.html",
+  "travel.html",
+  "video.html",
   "ai.html",
   "cities.html",
   "astana.html",
@@ -86,9 +95,20 @@ function cleanInquiryPage(value = location.href) {
     for (const [page, key] of [
       ["blog-post.html", "post"],
       ["blog-category.html", "category"],
+      ["course.html", "course"],
+      ["classroom.html", "course"],
+      ["classroom.html", "lesson"],
+      ["exam.html", "course"],
+      ["material.html", "resource"],
+      ["video.html", "video"],
     ]) {
       const id = url.searchParams.get(key);
-      if (file === page && /^[a-z0-9-]{1,100}$/.test(id || ""))
+      if (
+        file === page &&
+        (key === "video" ? /^[a-zA-Z0-9_-]{11}$/ : /^[a-z0-9-]{1,100}$/).test(
+          id || "",
+        )
+      )
         clean.searchParams.set(key, id);
     }
     if (file === "services.html" && /^#\/services\/[a-z0-9-]+$/.test(url.hash))
@@ -112,6 +132,19 @@ function inquiryPageContext() {
 function readRoute() {
   const segments = location.hash.slice(1).split("/").filter(Boolean);
   const file = location.pathname.split("/").pop();
+  const hubPages = {
+    "courses.html": "courses",
+    "course.html": "course",
+    "academy.html": "academy",
+    "classroom.html": "classroom",
+    "exam.html": "exam",
+    "materials.html": "materials",
+    "material.html": "material",
+    "travel.html": "travel",
+    "video.html": "video",
+  };
+  if (hubPages[file])
+    return { page: hubPages[file], service: "training", caseId: "ecom-us" };
   const utilityPages = {
     "privacy.html": "privacy",
     "cookies.html": "cookies",
@@ -525,6 +558,7 @@ function PortfolioRoot() {
           ? utilityMetadata(route.page)
           : null;
       const pageMeta =
+        (typeof hubMetadata === "function" && hubMetadata(route.page)) ||
         (typeof growthMetadata === "function" && growthMetadata(route.page)) ||
         utilityMeta ||
         blogMeta;
@@ -546,6 +580,37 @@ function PortfolioRoot() {
         title = translateText(visibleCase(route.caseId)?.title || "Cases");
       document.title =
         (pageMeta?.title || title) + " — " + window.PORTFOLIO.name;
+      if (
+        [
+          "courses",
+          "course",
+          "academy",
+          "classroom",
+          "exam",
+          "materials",
+          "material",
+          "travel",
+          "video",
+        ].includes(route.page)
+      ) {
+        const canonical = document.querySelector('link[rel="canonical"]');
+        const clean = cleanInquiryPage();
+        if (canonical && clean) {
+          const query = new URL(clean).searchParams;
+          if (language === "ru") query.delete("lang");
+          else query.set("lang", "en");
+          const target = new URL(canonical.href);
+          target.search = query.toString();
+          canonical.href = target.href;
+          document
+            .querySelectorAll('link[rel="alternate"][hreflang]')
+            .forEach((link) => {
+              const alternate = new URL(target);
+              alternate.searchParams.set("lang", link.hreflang);
+              link.href = alternate.href;
+            });
+        }
+      }
       if (["ai", "cities", "city"].includes(route.page)) {
         const canonical = document.querySelector('link[rel="canonical"]');
         if (canonical) {

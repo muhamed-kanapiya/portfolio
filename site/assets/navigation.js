@@ -89,6 +89,7 @@ function MegaHeader() {
   const [open, setOpen] = le.useState("");
   const root = le.useRef(null),
     serviceTrigger = le.useRef(null),
+    learningTrigger = le.useRef(null),
     mobileTrigger = le.useRef(null);
   const close = () => setOpen("");
   le.useEffect(() => {
@@ -96,7 +97,12 @@ function MegaHeader() {
     const onKey = (event) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        (open === "mobile" ? mobileTrigger : serviceTrigger).current?.focus();
+        (open === "mobile"
+          ? mobileTrigger
+          : open === "learning"
+            ? learningTrigger
+            : serviceTrigger
+        ).current?.focus();
         close();
       }
     };
@@ -156,6 +162,7 @@ function MegaHeader() {
         close();
     },
     children: [
+      i(AnnouncementBanner, {}),
       i("div", {
         className: "header-inner",
         children: [
@@ -190,6 +197,22 @@ function MegaHeader() {
                 ],
               }),
               ...navLinks(),
+              i("button", {
+                type: "button",
+                className: "mega-trigger",
+                ref: learningTrigger,
+                "aria-expanded": open === "learning",
+                "aria-controls": "mega-learning",
+                onClick: () => setOpen(open === "learning" ? "" : "learning"),
+                children: [
+                  learnSay("Ещё", "More"),
+                  i("span", {
+                    className: "mega-chevron",
+                    "aria-hidden": true,
+                    children: "⌄",
+                  }),
+                ],
+              }),
             ],
           }),
           i("div", {
@@ -275,6 +298,13 @@ function MegaHeader() {
             ],
           })
         : null,
+      open === "learning"
+        ? i("div", {
+            className: "learning-nav-panel",
+            id: "mega-learning",
+            children: i(LearningNavLinks, { onNavigate: close }),
+          })
+        : null,
       open === "mobile"
         ? i("nav", {
             className: "mega-mobile-panel",
@@ -298,6 +328,7 @@ function MegaHeader() {
                 className: "mega-mobile-links",
                 children: navLinks(),
               }),
+              i(LearningNavLinks, { onNavigate: close }),
             ],
           })
         : null,

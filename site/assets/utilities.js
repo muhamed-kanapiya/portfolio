@@ -62,15 +62,15 @@ const UTILITY_PAGES = {
     emoji: "🍪",
     title: utilityText("Cookies и настройки", "Cookies & preferences"),
     lead: utilityText(
-      "Две настройки для удобства. Без рекламных счётчиков.",
-      "Two convenience settings. No advertising trackers.",
+      "Настройки, учебный прогресс и внешние медиа.",
+      "Preferences, learning progress and external media.",
     ),
     sections: [
       [
         utilityText("Что сохраняет сайт", "What the site stores"),
         utilityText(
-          "Собственный код сайта не устанавливает cookies. В локальном хранилище браузера (localStorage) сохраняются только выбранный язык и валюта. Они остаются на вашем устройстве, пока вы не сбросите настройки или не очистите данные сайта в браузере.",
-          "The site's own code does not set cookies. Browser local storage (localStorage) holds only your selected language and currency. They remain on your device until you reset preferences or clear the site's browser data.",
+          "Собственный код сайта не устанавливает cookies. В локальном хранилище браузера (localStorage) сохраняются язык, валюта, закрытые объявления и прогресс демокурсов (пройденные уроки, лучший результат и число попыток экзамена). Они остаются на вашем устройстве, пока вы не сбросите настройки или не очистите данные сайта в браузере.",
+          "The site's own code does not set cookies. Browser local storage (localStorage) holds your language, currency, dismissed announcements and demo course progress (completed lessons, best score and exam attempt count). They remain on your device until you reset preferences or clear the site's browser data.",
         ),
       ],
       [
@@ -83,8 +83,8 @@ const UTILITY_PAGES = {
       [
         utilityText("Внешние сервисы", "External services"),
         utilityText(
-          "При переходе в GitHub, Google, соцсети или мессенджер настройки и cookies этих сервисов регулируются отдельно. Сброс ниже удаляет только две настройки портфолио и не изменяет данные других сайтов.",
-          "When you visit GitHub, Google, a social network or a messenger, those services manage their own preferences and cookies. The reset below removes only this portfolio's two preferences and does not change other websites' data.",
+          "При переходе в GitHub, Google, соцсети или мессенджер настройки и cookies этих сервисов регулируются отдельно. Сброс ниже удаляет язык и валюту. Прогресс сбрасывается отдельно в учебном кабинете. Закрытые объявления можно удалить очисткой данных сайта в настройках браузера. Данные других сайтов не изменяются.",
+          "When you visit GitHub, Google, a social network or a messenger, those services manage their own preferences and cookies. The reset below removes language and currency. Reset course progress separately in the classroom. Clear this site's browser data to remove dismissed announcements. Other websites' data is unaffected.",
         ),
       ],
     ],
@@ -131,6 +131,28 @@ const UTILITY_PAGES = {
     ],
   },
 };
+
+UTILITY_PAGES.privacy.sections.push([
+  utilityText("Обучение и видео", "Learning and video"),
+  utilityText(
+    "Демо-кабинет сохраняет прогресс только в браузере. Регистрации, серверного аккаунта и защиты учебных материалов нет. Превью путешествий загружаются с i.ytimg.com; при этом YouTube получает технические данные запроса. Проигрыватель youtube-nocookie.com загружается только по вашей кнопке и подчиняется правилам YouTube. Скачивание документов не требует контактов или подписки.",
+    "The demo classroom stores progress only in your browser. There is no registration, server account or protected lesson content. Travel thumbnails load from i.ytimg.com, sending technical request information to YouTube. The youtube-nocookie.com player loads only after you select its button and follows YouTube policies. Document downloads require no contact details or subscription.",
+  ),
+]);
+UTILITY_PAGES.cookies.sections.push([
+  utilityText("Видео YouTube", "YouTube videos"),
+  utilityText(
+    "Загрузка превью уже соединяет браузер с YouTube. Нажатие кнопки проигрывателя разрешает загрузить внешнее видео; настройки и хранение данных определяются этим сервисом.",
+    "Loading thumbnails connects your browser to YouTube. Selecting the player button permits loading the external video; that service governs its own settings and data storage.",
+  ),
+]);
+UTILITY_PAGES.terms.sections.push([
+  utilityText("Демокурсы и материалы", "Demo courses and resources"),
+  utilityText(
+    "Уроки, задания и тесты доступны как открытый учебный прототип. Самопроверка не является официальной сертификацией. Сопровождение преподавателем, сроки и стоимость согласуются отдельно. Документы можно использовать и адаптировать для своих проектов; учебные примеры не являются результатами клиентов.",
+    "Lessons, assignments and tests are available as an open learning prototype. Self-assessment is not official certification. Instructor support, timing and fees are agreed separately. Documents may be used and adapted for your projects; practice examples are not client results.",
+  ),
+]);
 
 function utilityMetadata(kind) {
   if (UTILITY_PAGES[kind])
@@ -304,6 +326,46 @@ function siteMapGroups() {
     href: pageLink(file),
   });
   return [
+    {
+      id: "learning",
+      emoji: "🎓",
+      title: learnSay("Обучение и материалы", "Learning and resources"),
+      links: [
+        page(learnSay("Все курсы", "All courses"), "courses.html"),
+        page(
+          learnSay("Учебный демо-кабинет", "Demo classroom"),
+          "academy.html",
+        ),
+        ...COURSES.flatMap((course) => [
+          { label: learnCopy(course.title), href: courseLink(course) },
+          {
+            label: learnSay("Уроки · ", "Lessons · ") + learnCopy(course.title),
+            href: courseLink(course, true),
+          },
+          {
+            label: learnSay("Экзамен · ", "Exam · ") + learnCopy(course.title),
+            href: hubLink("exam.html", "course", course.id),
+          },
+        ]),
+        page(learnSay("Все материалы", "All resources"), "materials.html"),
+        ...RESOURCES.map((resource) => ({
+          label: learnCopy(resource.title),
+          href: hubLink("material.html", "resource", resource.id),
+        })),
+      ],
+    },
+    {
+      id: "travel",
+      emoji: "🌏",
+      title: learnSay("Путешествия", "Travel"),
+      links: [
+        page(learnSay("Все видео", "All videos"), "travel.html"),
+        ...TRAVEL_VIDEOS.map((video) => ({
+          label: learnCopy(video.title),
+          href: hubLink("video.html", "video", video.id),
+        })),
+      ],
+    },
     {
       id: "main",
       emoji: "🏠",
@@ -611,6 +673,19 @@ function FooterDirectory() {
       ]),
       i(FooterSocials, {}),
       nav("Information", [
+        [
+          learnSay("Курсы и практикумы", "Courses and workshops"),
+          pageLink("courses.html"),
+        ],
+        [
+          learnSay("Учебный демо-кабинет", "Demo classroom"),
+          pageLink("academy.html"),
+        ],
+        [
+          learnSay("Библиотека материалов", "Resource library"),
+          pageLink("materials.html"),
+        ],
+        [learnSay("Путешествия", "Travel"), pageLink("travel.html")],
         [
           catalogTranslation("AI for business", "ИИ для бизнеса"),
           pageLink("ai.html"),
