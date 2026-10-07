@@ -319,6 +319,18 @@ function siteMapGroups() {
       ],
     },
     {
+      id: "growth",
+      emoji: "🌍",
+      title: catalogTranslation("AI & cities", "ИИ и города"),
+      links: [
+        page("AI for business", "ai.html"),
+        page(catalogTranslation("All cities", "Все города"), "cities.html"),
+        ...CITY_PAGES.map((city) =>
+          page(growthCopy(city.name), city.id + ".html"),
+        ),
+      ],
+    },
+    {
       id: "services",
       emoji: "🧩",
       title: translateText("Services"),
@@ -599,6 +611,11 @@ function FooterDirectory() {
       ]),
       i(FooterSocials, {}),
       nav("Information", [
+        [
+          catalogTranslation("AI for business", "ИИ для бизнеса"),
+          pageLink("ai.html"),
+        ],
+        [catalogTranslation("Cities", "Города"), pageLink("cities.html")],
         ["Privacy", pageLink("privacy.html")],
         ["Cookies & preferences", pageLink("cookies.html")],
         ["Service information", pageLink("terms.html")],

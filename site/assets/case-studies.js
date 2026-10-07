@@ -302,12 +302,7 @@ function CaseResults({ record }) {
           }),
         ],
       }),
-      i("div", {
-        className: "comparison-grid",
-        children: record.metrics.map((metric, index) =>
-          i(MetricComparison, { metric }, index),
-        ),
-      }),
+      i(CaseChartPanel, { record }, record.id),
       i("div", {
         className: "case-table-wrap",
         tabIndex: 0,

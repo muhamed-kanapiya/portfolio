@@ -39,6 +39,13 @@ function isClientsPage() {
 }
 
 const SITE_ENTRY_FILES = [
+  "ai.html",
+  "cities.html",
+  "astana.html",
+  "almaty.html",
+  "shymkent.html",
+  "karaganda.html",
+  "atyrau.html",
   "index.html",
   "services.html",
   "cases.html",
@@ -115,6 +122,21 @@ function readRoute() {
   if (window.PORTFOLIO_NOT_FOUND || utilityPages[file])
     return {
       page: window.PORTFOLIO_NOT_FOUND ? "not-found" : utilityPages[file],
+      service: "search-ads",
+      caseId: "ecom-us",
+    };
+  const growthPages = {
+    "ai.html": "ai",
+    "cities.html": "cities",
+    "astana.html": "city",
+    "almaty.html": "city",
+    "shymkent.html": "city",
+    "karaganda.html": "city",
+    "atyrau.html": "city",
+  };
+  if (growthPages[file])
+    return {
+      page: growthPages[file],
       service: "search-ads",
       caseId: "ecom-us",
     };
@@ -502,7 +524,10 @@ function PortfolioRoot() {
         typeof utilityMetadata === "function"
           ? utilityMetadata(route.page)
           : null;
-      const pageMeta = utilityMeta || blogMeta;
+      const pageMeta =
+        (typeof growthMetadata === "function" && growthMetadata(route.page)) ||
+        utilityMeta ||
+        blogMeta;
       let title = translateText("Google Ads, SEO and web development");
       if (route.page === "clients") title = translateText("All clients");
       if (route.page === "services-index")
@@ -521,6 +546,14 @@ function PortfolioRoot() {
         title = translateText(visibleCase(route.caseId)?.title || "Cases");
       document.title =
         (pageMeta?.title || title) + " — " + window.PORTFOLIO.name;
+      if (["ai", "cities", "city"].includes(route.page)) {
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+          const url = new URL(canonical.href);
+          url.search = currentLanguage === "en" ? "?lang=en" : "";
+          canonical.href = url.href;
+        }
+      }
       document.querySelector('meta[name="description"]').content = pageMeta
         ? pageMeta.description
         : route.page === "about"

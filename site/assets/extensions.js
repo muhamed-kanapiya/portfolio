@@ -629,8 +629,29 @@ function ServiceDetail({ service }) {
             className: "detail-sidebar",
             children: [
               i("h2", { children: "Explore services" }),
+              ...(service.relatedIds || []).map((id) => {
+                const related = tu.find((item) => item.id === id);
+                return i(
+                  "a",
+                  { href: detailLink("service", id), children: related.title },
+                  "related-" + id,
+                );
+              }),
+              service.category === "ai"
+                ? i("a", {
+                    href: pageLink("ai.html"),
+                    children: catalogTranslation(
+                      "AI solutions overview ↗",
+                      "Обзор решений с ИИ ↗",
+                    ),
+                  })
+                : null,
               ...tu
-                .filter((item) => item.category === service.category)
+                .filter(
+                  (item) =>
+                    item.category === service.category &&
+                    !(service.relatedIds || []).includes(item.id),
+                )
                 .map((item) =>
                   i(
                     "a",

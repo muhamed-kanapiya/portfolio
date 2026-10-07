@@ -26,6 +26,13 @@ for (const page of [
   "terms.html",
   "site-map.html",
   "404.html",
+  "ai.html",
+  "cities.html",
+  "astana.html",
+  "almaty.html",
+  "shymkent.html",
+  "karaganda.html",
+  "atyrau.html",
 ]) {
   const html = await readFile(path.join(site, page), "utf8");
   assert(
@@ -34,7 +41,14 @@ for (const page of [
   );
   for (const [, url] of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
     if (!/^(?:https?:|data:|mailto:|\/)/.test(url))
-      await access(path.join(site, url));
+      await access(
+        path.join(
+          site,
+          decodeURIComponent(
+            new URL(url, "https://local.test/").pathname,
+          ).slice(1),
+        ),
+      );
   }
 }
 const context = vm.createContext({ window: {} });
@@ -64,7 +78,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, fifteen HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, twenty-two HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -152,6 +166,17 @@ vm.runInContext(
   await readFile(path.join(site, "assets/catalog.js"), "utf8"),
   behavior,
 );
+for (const filename of [
+  "ai-services.js",
+  "case-chart-data.js",
+  "case-charts.js",
+  "growth-pages.js",
+]) {
+  vm.runInContext(
+    await readFile(path.join(site, "assets", filename), "utf8"),
+    behavior,
+  );
+}
 vm.runInContext(
   await readFile(path.join(site, "assets/cases.js"), "utf8"),
   behavior,
@@ -169,11 +194,11 @@ vm.runInContext(
   behavior,
 );
 
-assert.equal(vm.runInContext("tu.length", behavior), 31);
+assert.equal(vm.runInContext("tu.length", behavior), 39);
 assert.equal(vm.runInContext("Nn.length", behavior), 14);
 assert.equal(
   vm.runInContext("new Set(tu.map(item=>item.id)).size", behavior),
-  31,
+  39,
 );
 assert.equal(
   vm.runInContext("new Set(Nn.map(item=>item.id)).size", behavior),
@@ -272,7 +297,7 @@ for (const language of ["ru", "en"]) {
   }
 }
 console.log(
-  "Checked 31 services, 14 demo cases, 28 clients, archive routes, independent USD/RUB/KZT prices and both messenger drafts in RU/EN.",
+  "Checked 39 services, 14 demo cases, 28 clients, archive routes, independent USD/RUB/KZT prices and both messenger drafts in RU/EN.",
 );
 
 // Exercise the actual submit handler without opening or sending anything externally.
@@ -988,7 +1013,7 @@ for (const language of ["ru", "en"]) {
   const groups = vm.runInContext("siteMapGroups()", behavior);
   assert.equal(
     groups.find((group) => group.id === "services").links.length,
-    31,
+    39,
   );
   assert.equal(
     groups.find((group) => group.id === "cases").links.length,
@@ -1085,4 +1110,203 @@ assert(
 );
 console.log(
   "Checked utility pages, complete site directory and sanitized inquiry attribution in both messengers and languages.",
+);
+
+// New catalog offers must work through prices, lead context and both language versions.
+for (const language of ["ru", "en"]) {
+  vm.runInContext(`currentLanguage="${language}"`, behavior);
+  for (const offer of vm.runInContext("AI_OFFERS", behavior)) {
+    const service = vm.runInContext(
+      `tu.find(item=>item.id==="${offer.id}")`,
+      behavior,
+    );
+    assert.equal(service.category, "ai");
+    assert.equal(service.deliverables.length, 4);
+    assert.equal(service.process.length, 4);
+    assert.equal(service.faq.length, 4);
+    assert(
+      vm
+        .runInContext(
+          `translateText(tu.find(item=>item.id==="${offer.id}").title)`,
+          behavior,
+        )
+        .includes(language === "ru" ? "ИИ" : "AI"),
+    );
+    for (const pack of service.pricing) {
+      assert.deepEqual(
+        Object.keys(state.window.PRICES.services[offer.id][pack.pkg]),
+        ["USD", "RUB", "KZT"],
+      );
+    }
+    assert(
+      service.relatedIds.every((id) =>
+        vm.runInContext(`tu.some(item=>item.id==="${id}")`, behavior),
+      ),
+    );
+  }
+  for (const city of vm.runInContext("CITY_PAGES", behavior)) {
+    const cityUrl = `https://example.com/portfolio/${city.id}.html?lang=${language}`;
+    Object.assign(state.location, {
+      pathname: `/portfolio/${city.id}.html`,
+      href: cityUrl,
+      search: `?lang=${language}`,
+      hash: "",
+    });
+    assert.equal(vm.runInContext("readRoute().page", behavior), "city");
+    assert(
+      vm
+        .runInContext('growthMetadata("city").title', behavior)
+        .includes(city.local[language]),
+    );
+    assert.equal(vm.runInContext("cleanInquiryPage()", behavior), cityUrl);
+    for (const id of city.serviceIds)
+      assert(vm.runInContext(`tu.some(item=>item.id==="${id}")`, behavior));
+    for (const id of city.caseIds)
+      assert(vm.runInContext(`visibleCase("${id}")`, behavior));
+    const link = new URL(vm.runInContext("inquiryLink()", behavior), cityUrl);
+    assert.equal(
+      link.searchParams.get("from"),
+      `${city.id}.html?lang=${language}`,
+    );
+  }
+  assert.equal(
+    vm.runInContext(
+      'siteMapGroups().find(group=>group.id==="growth").links.length',
+      behavior,
+    ),
+    7,
+  );
+}
+assert.equal(
+  vm.runInContext(
+    "new Set(CITY_PAGES.map(city=>city.intro.ru)).size",
+    behavior,
+  ),
+  5,
+);
+assert.equal(
+  vm.runInContext("Object.keys(window.CASE_CHART_DATA).length", behavior),
+  0,
+  "Do not publish synthetic time series",
+);
+const seriesFixture = {
+  id: "traffic",
+  name: { ru: "Трафик", en: "Traffic" },
+  source: { ru: "Тестовая выгрузка", en: "Test export" },
+  unit: "",
+  points: [
+    { date: "2026-01-01", value: 0 },
+    { date: "2026-02-01", value: 180 },
+    { date: "2026-04-01", value: 120 },
+  ],
+};
+state.window.CASE_CHART_DATA.fixture = [seriesFixture];
+assert.equal(
+  vm.runInContext('validDatedSeries("fixture").length', behavior),
+  1,
+);
+for (const invalid of [
+  { ...seriesFixture, source: "" },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-02-30", value: 0 },
+      { date: "2026-03-01", value: 1 },
+    ],
+  },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-01-01", value: 0 },
+      { date: "2026-01-01", value: 1 },
+    ],
+  },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-02-01", value: 1 },
+      { date: "2026-01-01", value: 2 },
+    ],
+  },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-01-01", value: null },
+      { date: "2026-02-01", value: 1 },
+    ],
+  },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-01-01", value: Infinity },
+      { date: "2026-02-01", value: 1 },
+    ],
+  },
+  {
+    ...seriesFixture,
+    points: [
+      { date: "2026-01-01", value: -1 },
+      { date: "2026-02-01", value: 1 },
+    ],
+  },
+]) {
+  state.window.CASE_CHART_DATA.fixture = [invalid];
+  assert.equal(
+    vm.runInContext('validDatedSeries("fixture").length', behavior),
+    0,
+  );
+}
+delete state.window.CASE_CHART_DATA.fixture;
+assert.equal(
+  vm.runInContext(
+    'RangeComparisonChart({metric:{metric:"Test",before:"$1",after:"2%"}})',
+    behavior,
+  ),
+  null,
+);
+const chart = vm.runInContext(
+  'RangeComparisonChart({metric:{metric:"Test",before:"0-300",after:"1500-4000"}})',
+  behavior,
+);
+assert.equal(chart.type, "figure");
+assert(!/NaN|Infinity/.test(JSON.stringify(chart)));
+const previousHooks = state.le;
+let changedPoint;
+state.le = {
+  useState: (value) => [
+    value,
+    (next) => {
+      changedPoint = next;
+    },
+  ],
+  useRef: () => ({ current: null }),
+};
+state.datedFixture = seriesFixture;
+const datedFigure = vm.runInContext(
+  "DatedCaseChart({series:datedFixture})",
+  behavior,
+);
+const flattenChart = (node) =>
+  node && typeof node === "object"
+    ? [node, ...[node.props?.children].flat().flatMap(flattenChart)]
+    : [];
+const datedNodes = flattenChart(datedFigure);
+const line = datedNodes.find((node) => node.type === "polyline");
+const coordinates = line.props.points
+  .split(" ")
+  .map((pair) => pair.split(",").map(Number));
+assert(coordinates.flat().every(Number.isFinite));
+assert.equal(coordinates[0][0], 60);
+assert.equal(coordinates.at(-1)[0], 600);
+assert(
+  coordinates[1][0] < 330,
+  "Horizontal distance must follow dates, not equal point spacing",
+);
+const slider = datedNodes.find((node) => node.type === "input");
+assert.equal(slider.props.max, 2);
+slider.props.onChange({ target: { value: "1" } });
+assert.equal(changedPoint, 1);
+state.le = previousHooks;
+console.log(
+  "Checked 8 AI offers, 5 city pages, bilingual source attribution and honest range/dated-chart validation.",
 );

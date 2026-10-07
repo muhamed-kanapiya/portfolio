@@ -1,6 +1,11 @@
 /* Shared navigation. Blog previews deliberately have no links in this menu. */
 const MEGA_GROUPS = [
   {
+    title: catalogTranslation("AI for business", "ИИ для бизнеса"),
+    emoji: "✨",
+    ids: AI_OFFERS.map((offer) => offer.id),
+  },
+  {
     title: "Advertising",
     emoji: "📣",
     ids: [
@@ -246,6 +251,14 @@ function MegaHeader() {
               i("div", {
                 className: "mega-panel-bottom",
                 children: [
+                  i("a", {
+                    href: pageLink("ai.html"),
+                    onClick: close,
+                    children: catalogTranslation(
+                      "Explore AI solutions ↗",
+                      "Все решения с ИИ ↗",
+                    ),
+                  }),
                   i("span", { children: "Not sure where to start?" }),
                   i("a", {
                     href: inquiryLink(),

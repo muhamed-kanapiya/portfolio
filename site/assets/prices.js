@@ -22,6 +22,46 @@ window.PRICES = {
     },
   },
   services: {
+    "ai-reports": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-content": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-assistants": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-automation": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-creatives": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-web-tools": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-knowledge": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
+    "ai-training": {
+      Assessment: { USD: null, RUB: null, KZT: null },
+      Implementation: { USD: null, RUB: null, KZT: null },
+      "Ongoing support": { USD: null, RUB: null, KZT: null },
+    },
     "search-ads": {
       Audit: {
         USD: 49,
