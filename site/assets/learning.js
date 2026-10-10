@@ -1006,8 +1006,14 @@ function ClassroomLesson({ course, lesson }) {
                 children:
                   learnSay("УРОК ", "LESSON ") +
                   (index + 1) +
-                  " / 6 · " +
-                  learnSay("≈20 МИН + ПРАКТИКА", "≈20 MIN + PRACTICE"),
+                  " / " +
+                  course.lessons.length +
+                  " · ≈" +
+                  lesson.minutes +
+                  learnSay(
+                    " МИН НА РАЗБОР + ПРАКТИКА",
+                    " MIN FOR REVIEW + PRACTICE",
+                  ),
               }),
               i("h1", { children: learnCopy(lesson.title) }),
               !progress.enrolled &&
