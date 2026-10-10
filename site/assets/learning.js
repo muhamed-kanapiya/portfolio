@@ -113,9 +113,18 @@ function useLearningProgress() {
   const [state, setState] = le.useState(readLearningState);
   const [error, setError] = le.useState(false);
   le.useEffect(() => {
-    const sync = () => setState(readLearningState());
+    const sync = (event) =>
+      setState(
+        event?.type === "learningchange"
+          ? cleanLearningState(event.detail)
+          : readLearningState(),
+      );
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    window.addEventListener("learningchange", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("learningchange", sync);
+    };
   }, []);
   const save = (courseId, update) => {
     const latest = readLearningState();
@@ -139,8 +148,91 @@ function useLearningProgress() {
       setError(true);
     }
     setState(learningMemory);
+    window.dispatchEvent(
+      new CustomEvent("learningchange", { detail: learningMemory }),
+    );
   };
   return { state, save, error };
+}
+function courseCompleted(course, state) {
+  const progress = state?.[course?.id];
+  return !!(
+    course &&
+    progress?.enrolled &&
+    progress.attempts > 0 &&
+    progress.best >= 80 &&
+    course.lessons.every((lesson) => progress.completed?.includes(lesson.id))
+  );
+}
+function courseAccess(course, state = readLearningState()) {
+  if (!course?.level) return { unlocked: true, required: null };
+  const levels = ["junior", "middle", "senior"],
+    index = levels.indexOf(course.level);
+  for (const level of levels.slice(0, index)) {
+    const previous = COURSES.find(
+      (item) => item.topic === course.topic && item.level === level,
+    );
+    if (!courseCompleted(previous, state))
+      return { unlocked: false, required: previous };
+  }
+  return { unlocked: true, required: null };
+}
+function CourseLock({ course, state, standalone = false }) {
+  const access = courseAccess(course, state),
+    required = access.required;
+  if (access.unlocked) return null;
+  return i(standalone ? "main" : "aside", {
+    ...(standalone ? { id: "main-content" } : {}),
+    className: standalone ? "page-container hub-page" : "course-lock",
+    children: [
+      i("h2", {
+        children:
+          learnSay("🔒 Уровень ", "🔒 Level ") +
+          LEVEL_DETAILS[course.level].label,
+      }),
+      i("p", {
+        children:
+          learnSay(
+            "Сначала завершите все уроки и сдайте экзамен курса ",
+            "First complete every lesson and pass the exam for ",
+          ) +
+          learnCopy(required.title) +
+          learnSay(" с результатом от 80%.", " with at least 80%."),
+      }),
+      hubButton(
+        learnSay("Продолжить ", "Continue ") + learnCopy(required.title),
+        courseLink(required, true),
+      ),
+      i("p", {
+        className: "hub-small",
+        children: learnSay(
+          "Порядок обучения сохраняется в этом браузере. Это учебная блокировка, а не серверная защита контента.",
+          "The learning sequence is saved in this browser. This is a learning gate, not server-side content protection.",
+        ),
+      }),
+    ],
+  });
+}
+function NextCourse({ course, state }) {
+  if (!course.level || !courseCompleted(course, state)) return null;
+  const nextLevel = { junior: "middle", middle: "senior" }[course.level],
+    next = COURSES.find(
+      (item) => item.topic === course.topic && item.level === nextLevel,
+    );
+  return next && courseAccess(next, state).unlocked
+    ? i("aside", {
+        className: "course-lock is-unlocked",
+        children: [
+          i("strong", {
+            children: learnSay(
+              "✓ Следующий уровень открыт",
+              "✓ Next level unlocked",
+            ),
+          }),
+          hubButton(learnCopy(next.title) + " →", courseLink(next, true)),
+        ],
+      })
+    : null;
 }
 function ProgressError({ error }) {
   return error
@@ -155,6 +247,8 @@ function ProgressError({ error }) {
     : null;
 }
 function CourseCard({ course, progress }) {
+  const { state: accessState } = useLearningProgress();
+  const access = courseAccess(course, accessState);
   const done = progress?.completed.length || 0;
   const next = course.lessons.find(
     (lesson) => !progress?.completed.includes(lesson.id),
@@ -240,9 +334,17 @@ function CourseCard({ course, progress }) {
             progress
               ? learnSay("Продолжить →", "Continue →")
               : learnSay("Программа курса ↗", "Explore the course ↗"),
-            progress ? resume : courseLink(course),
+            progress && access.unlocked ? resume : courseLink(course),
             true,
           ),
+          !access.unlocked
+            ? i("p", {
+                className: "hub-small",
+                children:
+                  learnSay("🔒 Практика после ", "🔒 Practice after ") +
+                  learnCopy(access.required.title),
+              })
+            : null,
         ],
       }),
     ],
@@ -392,6 +494,7 @@ function CoursesPage() {
 }
 function CoursePage() {
   const course = selectedCourse();
+  const { state: accessState } = useLearningProgress();
   if (!course)
     return i(HubMissing, {
       title: learnSay("Все курсы", "All courses"),
@@ -500,6 +603,8 @@ function CoursePage() {
         ],
       }),
       i(CoursePricePlans, { course }),
+      i(CourseLock, { course, state: accessState }),
+      i(NextCourse, { course, state: accessState }),
       i("section", {
         className: "hub-grid two hub-section",
         children: [
@@ -546,7 +651,8 @@ function CoursePage() {
               i(
                 "details",
                 {
-                  open: index === 0,
+                  open:
+                    index === 0 && courseAccess(course, accessState).unlocked,
                   children: [
                     i("summary", {
                       children: [
@@ -561,23 +667,34 @@ function CoursePage() {
                     i("div", {
                       className: "curriculum-copy",
                       children: [
-                        i("p", { children: learnCopy(lesson.body) }),
-                        i("p", {
-                          children: [
-                            i("strong", {
-                              children: learnSay("Практика: ", "Practice: "),
+                        !courseAccess(course, accessState).unlocked
+                          ? i(CourseLock, { course, state: accessState })
+                          : i(Pi, {
+                              children: [
+                                i("p", { children: learnCopy(lesson.body) }),
+                                i("p", {
+                                  children: [
+                                    i("strong", {
+                                      children: learnSay(
+                                        "Практика: ",
+                                        "Practice: ",
+                                      ),
+                                    }),
+                                    learnCopy(lesson.practice),
+                                  ],
+                                }),
+                                i("a", {
+                                  href:
+                                    courseLink(course, true) +
+                                    "&lesson=" +
+                                    lesson.id,
+                                  children: learnSay(
+                                    "Посмотреть демоурок →",
+                                    "View demo lesson →",
+                                  ),
+                                }),
+                              ],
                             }),
-                            learnCopy(lesson.practice),
-                          ],
-                        }),
-                        i("a", {
-                          href:
-                            courseLink(course, true) + "&lesson=" + lesson.id,
-                          children: learnSay(
-                            "Посмотреть демоурок →",
-                            "View demo lesson →",
-                          ),
-                        }),
                       ],
                     }),
                   ],
@@ -911,11 +1028,14 @@ function LessonQuiz({ quiz, onCorrect }) {
 }
 function ClassroomPage() {
   const course = selectedCourse();
+  const { state } = useLearningProgress();
   if (!course)
     return i(HubMissing, {
       title: learnSay("Все курсы", "All courses"),
       file: "courses.html",
     });
+  if (!courseAccess(course, state).unlocked)
+    return i(CourseLock, { course, state, standalone: true });
   const requested = new URLSearchParams(location.search).get("lesson");
   const lesson = requested
     ? course.lessons.find((item) => item.id === requested)
@@ -1217,6 +1337,8 @@ function CourseExam({ course }) {
     if (result) resultRef.current?.focus();
   }, [result]);
   const questions = COURSE_EXAMS[course.id];
+  if (!courseAccess(course, state).unlocked)
+    return i(CourseLock, { course, state, standalone: true });
   const unlocked =
     progress.enrolled && progress.completed.length === course.lessons.length;
   return i("main", {
@@ -1238,6 +1360,7 @@ function CourseExam({ course }) {
       }),
       i(DemoNotice, {}),
       i(ProgressError, { error }),
+      i(NextCourse, { course, state }),
       !unlocked
         ? i("section", {
             className: "hub-empty",

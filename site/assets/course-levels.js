@@ -848,10 +848,10 @@ for (const topic of ["seo", "google-ads"])
       project: learnPair(
         "Соберите итоговый проект: " +
           LEVEL_OUTCOMES[id][0] +
-          " Приложите исходные допущения, результаты двух заданий симулятора и объяснение ограничений выбранного решения.",
+          " Приложите исходные допущения, результаты заданий лаборатории и объяснение ограничений выбранного решения.",
         "Build a final project: " +
           LEVEL_OUTCOMES[id][1] +
-          " Include assumptions, results from both simulator tasks and an explanation of your decision's limitations.",
+          " Include assumptions, results from the project lab tasks and an explanation of your decision's limitations.",
       ),
       effort: detail.time,
       accent:

@@ -1004,10 +1004,13 @@ for (const hubFile of [
   "learning-data.js",
   "course-levels.js",
   "simulator-models.js",
+  "lab-data.js",
+  "lab-engine.js",
   "resources-data.js",
   "travel-data.js",
   "learning.js",
   "simulators.js",
+  "lab-workspace.js",
   "resources.js",
   "travel.js",
   "announcements.js",
@@ -1659,3 +1662,6 @@ for (const language of ["ru", "en"]) {
 console.log(
   "Checked course/format/fee attribution in both messenger draft languages and invalid-course rejection.",
 );
+
+const { checkLabs } = await import("./check-labs.mjs");
+checkLabs(behavior);

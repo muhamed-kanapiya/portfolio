@@ -69,8 +69,8 @@ const UTILITY_PAGES = {
       [
         utilityText("Что сохраняет сайт", "What the site stores"),
         utilityText(
-          "Собственный код сайта не устанавливает cookies. В локальном хранилище браузера (localStorage) сохраняются язык, валюта, закрытые объявления и прогресс демокурсов (пройденные уроки, лучший результат и число попыток экзамена). Они остаются на вашем устройстве, пока вы не сбросите настройки или не очистите данные сайта в браузере.",
-          "The site's own code does not set cookies. Browser local storage (localStorage) holds your language, currency, dismissed announcements and demo course progress (completed lessons, best score and exam attempt count). They remain on your device until you reset preferences or clear the site's browser data.",
+          "Собственный код сайта не устанавливает cookies. В локальном хранилище браузера (localStorage) сохраняются язык, валюта, закрытые объявления и прогресс демокурсов (пройденные уроки, лучший результат и число попыток экзамена), а также настройки учебных проектов и отметки заданий симуляторов. Они остаются на вашем устройстве, пока вы не сбросите настройки или не очистите данные сайта в браузере.",
+          "The site's own code does not set cookies. Browser local storage (localStorage) holds your language, currency, dismissed announcements and demo course progress (completed lessons, best score and exam attempt count), plus simulator project settings and task history. They remain on your device until you reset preferences or clear the site's browser data.",
         ),
       ],
       [

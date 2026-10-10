@@ -86,8 +86,8 @@ function SimulatorChart({ topic, result }) {
           i("strong", { children: label }),
           i("span", {
             children: learnSay(
-              "Учебная модель · 8 недель для SEO / 4 для Ads",
-              "Teaching model · 8 SEO weeks / 4 Ads weeks",
+              "Учебная модель · 12 недель для SEO / 4 для Ads",
+              "Teaching model · 12 SEO weeks / 4 Ads weeks",
             ),
           }),
         ],
@@ -198,7 +198,7 @@ function SimulatorChart({ topic, result }) {
             ? i("span", {
                 children:
                   topic === "google-ads"
-                    ? learnSay("┄ База: 50/50", "┄ Baseline: 50/50")
+                    ? learnSay("┄ Учебная база", "┄ Teaching baseline")
                     : learnSay("┄ Без изменений", "┄ No changes"),
               })
             : null,
@@ -251,7 +251,7 @@ function SimulatorChart({ topic, result }) {
                         children:
                           metric === "value"
                             ? topic === "google-ads"
-                              ? learnSay("База: 50/50", "Baseline: 50/50")
+                              ? learnSay("Учебная база", "Teaching baseline")
                               : learnSay("Без изменений", "No changes")
                             : "CTR, %",
                       }),
@@ -286,419 +286,11 @@ function SimulatorChart({ topic, result }) {
     ],
   });
 }
-function SimulatorWorkbench({ topic, level = "junior", initialTask }) {
-  const tasks = SIM_TASKS[topic].filter((task) => task.level === level);
-  const first = tasks.find((task) => task.id === initialTask) || tasks[0];
-  const [taskId, setTaskId] = le.useState(first.id),
-    [input, setInput] = le.useState({
-      ...SIM_DEFAULTS[topic],
-      ...first.defaults,
-    }),
-    [review, setReview] = le.useState(false);
-  const task = tasks.find((item) => item.id === taskId) || first;
-  const result =
-      topic === "seo" ? simulateSEO(input, task) : simulateAds(input),
-    checks = simulatorChecks(topic, task, result),
-    passed = checks.every((check) => check.passed);
-  const change = (key, value) => {
-    setInput((previous) => ({ ...previous, [key]: value }));
-    setReview(false);
-  };
-  const reset = () => {
-    setInput({ ...SIM_DEFAULTS[topic], ...task.defaults });
-    setReview(false);
-  };
-  const switchTask = (id) => {
-    const next = tasks.find((item) => item.id === id);
-    setTaskId(id);
-    setInput({ ...SIM_DEFAULTS[topic], ...next.defaults });
-    setReview(false);
-  };
-  const checkbox = (id, label, text) =>
-    i(
-      "label",
-      {
-        className: "sim-check",
-        children: [
-          i("input", {
-            type: "checkbox",
-            checked: input[id] === true,
-            onChange: (event) => change(id, event.target.checked),
-          }),
-          i("span", {
-            children: [
-              i("strong", { children: label }),
-              text ? i("small", { children: text }) : null,
-            ],
-          }),
-        ],
-      },
-      id,
-    );
-  const range = (id, label, min, max, step, suffix) =>
-    i("label", {
-      className: "sim-range",
-      children: [
-        i("span", {
-          children: [
-            label,
-            i("strong", { children: simNumber(input[id]) + suffix }),
-          ],
-        }),
-        i("input", {
-          type: "range",
-          min,
-          max,
-          step,
-          value: input[id],
-          onChange: (event) => change(id, Number(event.target.value)),
-          "aria-label": label,
-        }),
-      ],
-    });
-  const metrics =
-    topic === "seo"
-      ? ["hours", "indexable", "clicks", "ctr"]
-      : ["spend", "leads", "quality", "cpql", "roas", "profit"];
-  return i("section", {
-    className: "sim-workbench",
-    children: [
-      i("div", {
-        className: "sim-task-bar",
-        children: [
-          i("label", {
-            className: "sim-select",
-            children: [
-              learnSay("Задание", "Task"),
-              i("select", {
-                value: task.id,
-                onChange: (event) => switchTask(event.target.value),
-                children: tasks.map((item) =>
-                  i(
-                    "option",
-                    { value: item.id, children: learnCopy(item.title) },
-                    item.id,
-                  ),
-                ),
-              }),
-            ],
-          }),
-          i("span", {
-            className: "sim-level",
-            children: LEVEL_DETAILS[level].label,
-          }),
-        ],
-      }),
-      i("p", { className: "sim-brief", children: learnCopy(task.brief) }),
-      i("div", {
-        className: "sim-layout",
-        children: [
-          i("div", {
-            className: "sim-controls",
-            children: [
-              i("h3", { children: learnSay("Ваши решения", "Your decisions") }),
-              topic === "seo"
-                ? SEO_ACTIONS.map((action) =>
-                    checkbox(
-                      action.id,
-                      learnCopy(action.label) +
-                        " · " +
-                        action.hours +
-                        learnSay(" ч", " h"),
-                      learnCopy(action.text),
-                    ),
-                  )
-                : [
-                    range(
-                      "budget",
-                      learnSay("Бюджет на 4 недели", "Four-week budget"),
-                      100000,
-                      600000,
-                      10000,
-                      " ₸",
-                    ),
-                    range(
-                      "allocation",
-                      learnSay(
-                        "Доля высокого интента",
-                        "High-intent allocation",
-                      ),
-                      0,
-                      100,
-                      5,
-                      "%",
-                    ),
-                    i("p", {
-                      className: "hub-small",
-                      children: learnSay(
-                        "Остаток — широкий спрос. При насыщении спроса часть бюджета не расходуется.",
-                        "The remainder goes to broad demand. Saturated demand leaves part of the budget unspent.",
-                      ),
-                    }),
-                    checkbox(
-                      "negatives",
-                      learnSay(
-                        "Исключить нецелевые запросы",
-                        "Exclude irrelevant queries",
-                      ),
-                      learnSay(
-                        "Меньше доступных кликов, выше качество широкого спроса.",
-                        "Fewer available clicks; higher quality in broad demand.",
-                      ),
-                    ),
-                    checkbox(
-                      "landing",
-                      learnSay(
-                        "Улучшить посадочную",
-                        "Improve the landing page",
-                      ),
-                      learnSay(
-                        "Разовые расходы: 20 000 ₸; учтены во вкладе после рекламы.",
-                        "One-time cost: KZT 20,000; included in contribution after ads.",
-                      ),
-                    ),
-                    checkbox(
-                      "qualified",
-                      learnSay(
-                        "Оценивать квалифицированные лиды",
-                        "Evaluate qualified leads",
-                      ),
-                      learnSay(
-                        "Меняет цель отчёта, само по себе не улучшает продажи.",
-                        "Changes the reporting goal; does not improve sales by itself.",
-                      ),
-                    ),
-                  ],
-              i("div", {
-                className: "hub-actions",
-                children: [
-                  i("button", {
-                    type: "button",
-                    className: "action",
-                    onClick: () => setReview(true),
-                    children: learnSay("Проверить решение", "Check solution"),
-                  }),
-                  i("button", {
-                    type: "button",
-                    className: "sim-reset",
-                    onClick: reset,
-                    children: learnSay("Сбросить", "Reset"),
-                  }),
-                ],
-              }),
-            ],
-          }),
-          i("div", {
-            className: "sim-output",
-            children: [
-              i("div", {
-                className: "sim-metrics",
-                children: metrics.map((metric) =>
-                  i(
-                    "div",
-                    {
-                      children: [
-                        i("span", { children: learnCopy(SIM_LABELS[metric]) }),
-                        i("strong", {
-                          children: simNumber(
-                            result[metric],
-                            metric === "ctr" ? 1 : 0,
-                          ),
-                        }),
-                      ],
-                    },
-                    metric,
-                  ),
-                ),
-              }),
-              i(SimulatorChart, { topic, result }, task.id),
-              topic === "google-ads"
-                ? i("details", {
-                    children: [
-                      i("summary", {
-                        children: learnSay(
-                          "Расходы и воронка по сегментам",
-                          "Segment spend and funnel",
-                        ),
-                      }),
-                      i("div", {
-                        className: "sim-table-scroll",
-                        children: i("table", {
-                          children: [
-                            i("thead", {
-                              children: i("tr", {
-                                children: [
-                                  "",
-                                  learnSay("Расход, ₸", "Spend, KZT"),
-                                  learnSay("Клики", "Clicks"),
-                                  learnSay("Лиды", "Leads"),
-                                  learnSay("Кач. лиды", "Qualified"),
-                                ].map((title, index) =>
-                                  i(
-                                    "th",
-                                    { scope: "col", children: title },
-                                    index,
-                                  ),
-                                ),
-                              }),
-                            }),
-                            i("tbody", {
-                              children: result.rows.map((row) =>
-                                i(
-                                  "tr",
-                                  {
-                                    children: [
-                                      i("th", {
-                                        scope: "row",
-                                        children: learnCopy(row.name),
-                                      }),
-                                      ...[
-                                        "spend",
-                                        "clicks",
-                                        "leads",
-                                        "qualifiedLeads",
-                                      ].map((key) =>
-                                        i(
-                                          "td",
-                                          { children: simNumber(row[key], 1) },
-                                          key,
-                                        ),
-                                      ),
-                                    ],
-                                  },
-                                  row.name.en,
-                                ),
-                              ),
-                            }),
-                          ],
-                        }),
-                      }),
-                      i("p", {
-                        className: "hub-small",
-                        children:
-                          learnSay("Ожидаемые продажи: ", "Expected sales: ") +
-                          simNumber(result.sales, 1) +
-                          " · ROAS: " +
-                          simNumber(result.roas) +
-                          "% · " +
-                          learnSay("Цель отчёта: ", "Reporting goal: ") +
-                          (input.qualified
-                            ? learnSay(
-                                "квалифицированные лиды",
-                                "qualified leads",
-                              )
-                            : learnSay("все заявки", "all leads")),
-                      }),
-                    ],
-                  })
-                : null,
-            ],
-          }),
-        ],
-      }),
-      i("div", {
-        className:
-          "sim-review" + (review ? (passed ? " is-pass" : " is-retry") : ""),
-        "aria-live": "polite",
-        children: [
-          i("h3", {
-            children: review
-              ? passed
-                ? learnSay("✓ Условия выполнены", "✓ Conditions met")
-                : learnSay(
-                    "Ещё не все условия выполнены",
-                    "Some conditions are not yet met",
-                  )
-              : learnSay("Критерии задания", "Task criteria"),
-          }),
-          i("ul", {
-            children: checks.map((check) =>
-              i(
-                "li",
-                {
-                  children: [
-                    i("span", {
-                      children:
-                        learnCopy(SIM_LABELS[check.metric]) +
-                        ": " +
-                        (check.min !== undefined
-                          ? "≥ " + simNumber(check.min)
-                          : "") +
-                        (check.min !== undefined && check.max !== undefined
-                          ? " · "
-                          : "") +
-                        (check.max !== undefined
-                          ? "≤ " + simNumber(check.max)
-                          : ""),
-                    }),
-                    review
-                      ? i("strong", {
-                          children:
-                            (check.passed ? "✓ " : "○ ") +
-                            simNumber(check.actual, 1),
-                        })
-                      : null,
-                  ],
-                },
-                check.metric,
-              ),
-            ),
-          }),
-          review
-            ? i("p", {
-                children: passed
-                  ? learnSay(
-                      "Сохраните в своей работе настройки, механизм эффекта и ограничения модели. Успешный сценарий здесь не гарантирует результат в реальном проекте.",
-                      "Record settings, the mechanism of change and model limitations in your assignment. A successful scenario here does not guarantee real-world outcomes.",
-                    )
-                  : topic === "seo"
-                    ? learnSay(
-                        "Проверьте лимит часов. noindex, контент и CTR решают разные проблемы; при миграции сначала учтите риск потери показов.",
-                        "Check the hour limit. noindex, content and CTR address different problems; in migration scenarios account for impression-loss risk first.",
-                      )
-                    : learnSay(
-                        "Сравните качество сегментов и предел спроса. Рост бюджета не заменяет релевантность, а настройка цели не создаёт дополнительные продажи.",
-                        "Compare segment quality and demand caps. More budget cannot replace relevance, and selecting a goal does not create additional sales.",
-                      ),
-              })
-            : null,
-        ],
-      }),
-      i("details", {
-        className: "sim-assumptions",
-        children: [
-          i("summary", {
-            children: learnSay(
-              "Как устроена модель и что она не учитывает",
-              "Model assumptions and limitations",
-            ),
-          }),
-          i("p", {
-            children:
-              topic === "seo"
-                ? learnSay(
-                    "Старт: 12 000 показов в неделю и CTR 2%. Техническая правка добавляет до 6 000 показов, контент — до 10 000, ссылки — до 2 500. Эффект нарастает с задержкой 1–2 недели. Сниппеты добавляют до 0,8 п. п. CTR, контент — 0,3 п. п. Без защиты миграции показы снижаются на 35%. Это заданные учебные допущения, а не реальные коэффициенты ранжирования. Доступность страницы не гарантирует её индексацию.",
-                    "Baseline: 12,000 weekly impressions and 2% CTR. Technical fixes add up to 6,000 impressions, content 10,000 and links 2,500. Effects ramp up after a 1–2 week delay. Snippets add up to 0.8 percentage points to CTR, content 0.3. Unprotected migration loses 35% of impressions. These are teaching assumptions, not actual ranking coefficients. Indexability does not guarantee indexing.",
-                  )
-                : learnSay(
-                    "Высокий интент: CPC 500 ₸, максимум 480 кликов, конверсия 12%, качество 80%. Широкий спрос: CPC 200 ₸, максимум 900 кликов, конверсия 2,5%, качество 35%. Исключения: максимум 675 кликов, конверсия ×1,8, качество 60%. Посадочная: конверсия ×1,25 / ×1,45 и 20 000 ₸ расходов. В продажу переходят 35% качественных лидов; заказ 70 000 ₸, маржа 55%. CPQL = расход / качественные лиды. Вклад = выручка × маржа − реклама − посадочная. База сравнения: тот же бюджет с распределением 50/50 без улучшений. График равномерно накапливает ожидание за четыре недели; задержка продаж, налоги, аукцион и сезонность не моделируются.",
-                    "High intent: KZT 500 CPC, 480-click cap, 12% conversion and 80% qualification. Broad demand: KZT 200 CPC, 900-click cap, 2.5% conversion and 35% qualification. Negatives: 675-click cap, conversion ×1.8, qualification 60%. Landing changes: conversion ×1.25 / ×1.45 and KZT 20,000 cost. Qualified leads close at 35%; orders average KZT 70,000 at 55% margin. CPQL = spend / qualified leads. Contribution = revenue × margin − ads − landing cost. Comparison baseline: the same budget split 50/50 without improvements. The chart accumulates expectations evenly over four weeks; sale delays, taxes, auctions and seasonality are not modeled.",
-                  ),
-          }),
-          i("p", {
-            className: "hub-small",
-            children: learnSay(
-              "Данные синтетические. Изменения пересчитываются сразу; дробные значения — математическое ожидание. Проверка использует числа до округления. Сценарий сбрасывается при перезагрузке.",
-              "Data is synthetic. Changes recalculate instantly; fractions represent expected outcomes. Checks use unrounded values. Reloading resets the scenario.",
-            ),
-          }),
-        ],
-      }),
-    ],
-  });
-}
 function CourseSimulator({ course }) {
+  const { state } = useLearningProgress();
   if (!course.simulator) return null;
+  if (!courseAccess(course, state).unlocked)
+    return i(CourseLock, { course, state });
   return i("section", {
     className: "hub-section",
     id: "simulator",
@@ -721,12 +313,12 @@ function CourseSimulator({ course }) {
       i("p", {
         className: "hub-small",
         children: learnSay(
-          "Два задания этого уровня. Изменяйте решения, сравнивайте графики и проверяйте ограничения.",
-          "Two tasks at this level. Adjust decisions, compare charts and check constraints.",
+          "Четыре учебных бизнеса, банк запросов и связанные задания. Настройте проект, запустите проверки и объясните результат.",
+          "Four training businesses, a keyword bank and connected tasks. Configure a project, run checks and explain the result.",
         ),
       }),
       i(
-        SimulatorWorkbench,
+        LabWorkspace,
         { topic: course.simulator, level: course.level },
         course.id,
       ),
@@ -734,6 +326,7 @@ function CourseSimulator({ course }) {
   });
 }
 function SimulatorPage({ topic }) {
+  const { state } = useLearningProgress();
   const query = new URLSearchParams(location.search),
     requested = query.get("level"),
     [level, setLevel] = le.useState(
@@ -750,8 +343,8 @@ function SimulatorPage({ topic }) {
           learnSay("Симулятор ", "Simulator: ") +
           (topic === "seo" ? "SEO" : "Google Ads"),
         text: learnSay(
-          "Решения → данные → выводы. Шесть задач, три уровня, графики и проверка условий. Без рекламного бюджета и подключения аккаунтов.",
-          "Decisions → data → insights. Six tasks, three levels, charts and criteria checks. No ad budget or account connection required.",
+          "Решения → данные → выводы. 16 заданий, 4 проекта, 32 запроса для каждого проекта. Без рекламного бюджета и подключения аккаунтов.",
+          "Decisions → data → insights. 16 tasks, 4 projects, 32 queries per project. No ad budget or account connection required.",
         ),
       }),
       i("div", {
@@ -763,6 +356,19 @@ function SimulatorPage({ topic }) {
             {
               type: "button",
               "aria-pressed": value === level,
+              disabled: !courseAccess(
+                COURSES.find((c) => c.id === topic + "-" + value),
+                state,
+              ).unlocked,
+              title: courseAccess(
+                COURSES.find((c) => c.id === topic + "-" + value),
+                state,
+              ).unlocked
+                ? ""
+                : learnSay(
+                    "Сначала пройдите предыдущие уровни",
+                    "Complete previous levels first",
+                  ),
               onClick: () => {
                 setLevel(value);
                 const url = new URL(location.href);
@@ -771,17 +377,25 @@ function SimulatorPage({ topic }) {
                 url.searchParams.delete("course");
                 history.replaceState(null, "", url);
               },
-              children: LEVEL_DETAILS[value].label,
+              children:
+                (courseAccess(
+                  COURSES.find((c) => c.id === topic + "-" + value),
+                  state,
+                ).unlocked
+                  ? ""
+                  : "🔒 ") + LEVEL_DETAILS[value].label,
             },
             value,
           ),
         ),
       }),
-      i(
-        SimulatorWorkbench,
-        { topic, level, initialTask: query.get("task") },
-        topic + level,
-      ),
+      courseAccess(course, state).unlocked
+        ? i(
+            LabWorkspace,
+            { topic, level, initialTask: query.get("task") },
+            topic + level,
+          )
+        : i(CourseLock, { course, state }),
       i("div", {
         className: "hub-actions",
         children: [

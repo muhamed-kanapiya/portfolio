@@ -206,15 +206,15 @@ function hubMetadata(page) {
     "seo-simulator": [
       learnSay("Симулятор SEO", "SEO simulator"),
       learnSay(
-        "Шесть заданий: индексация, контент, CTR и миграция. Графики и проверка решений.",
-        "Six tasks: indexing, content, CTR and migration. Charts and decision checks.",
+        "16 заданий и 4 проекта: индексация, контент, CTR и миграция. Графики и проверка решений.",
+        "16 tasks and 4 projects: indexing, content, CTR and migration. Charts and decision checks.",
       ),
     ],
     "google-ads-simulator": [
       learnSay("Симулятор Google Ads", "Google Ads simulator"),
       learnSay(
-        "Шесть заданий: бюджет, качество лидов и прибыль. Учебная модель с графиками.",
-        "Six tasks: budget, lead quality and profit. A teaching model with charts.",
+        "16 заданий и 4 проекта: бюджет, качество лидов и прибыль. Учебная модель с графиками.",
+        "16 tasks and 4 projects: budget, lead quality and profit. A teaching model with charts.",
       ),
     ],
     courses: [
