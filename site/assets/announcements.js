@@ -2,10 +2,10 @@
 const SITE_ANNOUNCEMENTS = {
   banner: {
     enabled: true,
-    id: "learning-library-2026-10",
+    id: "learning-levels-2026-10",
     text: learnPair(
-      "Учиться и пробовать: практикумы, чек-листы и шаблоны",
-      "Learn by doing: workshops, checklists and templates",
+      "SEO и Google Ads: Junior → Middle → Senior. Попробуйте симуляторы.",
+      "SEO and Google Ads: Junior → Middle → Senior. Try the simulators.",
     ),
     label: learnPair("Открыть курсы →", "Explore courses →"),
     file: "courses.html",
@@ -92,6 +92,8 @@ function ResourceSlideIn() {
     return () => clearTimeout(timer);
   }, [closed, config.enabled]);
   const excluded = [
+    "seo-simulator",
+    "google-ads-simulator",
     "academy",
     "classroom",
     "exam",
@@ -140,6 +142,21 @@ function LearningNavLinks({ onNavigate }) {
     className: "learning-nav-links",
     children: [
       [
+        "🧪",
+        "seo-simulator.html",
+        learnSay("Симулятор SEO", "SEO simulator"),
+        learnSay(
+          "Индексация, контент и динамика",
+          "Indexing, content and trends",
+        ),
+      ],
+      [
+        "🎛️",
+        "google-ads-simulator.html",
+        learnSay("Симулятор Google Ads", "Google Ads simulator"),
+        learnSay("Бюджет, лиды и экономика", "Budget, leads and economics"),
+      ],
+      [
         "🎓",
         "courses.html",
         learnSay("Курсы", "Courses"),
@@ -186,6 +203,20 @@ function LearningNavLinks({ onNavigate }) {
 }
 function hubMetadata(page) {
   const entries = {
+    "seo-simulator": [
+      learnSay("Симулятор SEO", "SEO simulator"),
+      learnSay(
+        "Шесть заданий: индексация, контент, CTR и миграция. Графики и проверка решений.",
+        "Six tasks: indexing, content, CTR and migration. Charts and decision checks.",
+      ),
+    ],
+    "google-ads-simulator": [
+      learnSay("Симулятор Google Ads", "Google Ads simulator"),
+      learnSay(
+        "Шесть заданий: бюджет, качество лидов и прибыль. Учебная модель с графиками.",
+        "Six tasks: budget, lead quality and profit. A teaching model with charts.",
+      ),
+    ],
     courses: [
       learnSay("Курсы и практикумы", "Courses and workshops"),
       learnSay(

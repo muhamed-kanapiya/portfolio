@@ -2148,6 +2148,8 @@ function Ni() {
       e === "about" && i(AboutPage, {}),
       e === "courses" && i(CoursesPage, {}),
       e === "course" && i(CoursePage, {}),
+      e === "seo-simulator" && i(SimulatorPage, { topic: "seo" }),
+      e === "google-ads-simulator" && i(SimulatorPage, { topic: "google-ads" }),
       e === "academy" && i(AcademyPage, {}),
       e === "classroom" && i(ClassroomPage, {}),
       e === "exam" && i(ExamPage, {}),

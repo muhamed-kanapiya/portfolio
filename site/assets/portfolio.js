@@ -39,6 +39,8 @@ function isClientsPage() {
 }
 
 const SITE_ENTRY_FILES = [
+  "seo-simulator.html",
+  "google-ads-simulator.html",
   "courses.html",
   "course.html",
   "academy.html",
@@ -101,6 +103,9 @@ function cleanInquiryPage(value = location.href) {
       ["exam.html", "course"],
       ["material.html", "resource"],
       ["video.html", "video"],
+      ...["seo-simulator.html", "google-ads-simulator.html"].flatMap((file) =>
+        ["level", "task", "course"].map((key) => [file, key]),
+      ),
     ]) {
       const id = url.searchParams.get(key);
       if (
@@ -133,6 +138,8 @@ function readRoute() {
   const segments = location.hash.slice(1).split("/").filter(Boolean);
   const file = location.pathname.split("/").pop();
   const hubPages = {
+    "seo-simulator.html": "seo-simulator",
+    "google-ads-simulator.html": "google-ads-simulator",
     "courses.html": "courses",
     "course.html": "course",
     "academy.html": "academy",
@@ -583,6 +590,8 @@ function PortfolioRoot() {
       if (
         [
           "courses",
+          "seo-simulator",
+          "google-ads-simulator",
           "course",
           "academy",
           "classroom",

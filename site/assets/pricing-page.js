@@ -60,15 +60,12 @@ function PricingPage() {
   const goToPage = (next) => {
     setPage(next);
     requestAnimationFrame(() =>
-      document
-        .querySelector(".price-table-scroll")
-        ?.scrollIntoView({
-          block: "start",
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
-            .matches
-            ? "instant"
-            : "smooth",
-        }),
+      document.querySelector(".price-table-scroll")?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      }),
     );
   };
   const change = (key, value) => {
@@ -350,6 +347,7 @@ function PricingPage() {
           }),
         ],
       }),
+      i(CoursePricingTable, {}),
     ],
   });
 }

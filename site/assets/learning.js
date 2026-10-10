@@ -173,9 +173,9 @@ function CourseCard({ course, progress }) {
           i("span", {
             className: "course-art-line",
             children:
-              course.id === "google-ads"
+              (course.topic || course.id) === "google-ads"
                 ? "intent → lead → sale"
-                : course.id === "seo"
+                : (course.topic || course.id) === "seo"
                   ? "discover. answer. grow."
                   : course.id === "analytics"
                     ? "event → insight → action"
@@ -188,7 +188,10 @@ function CourseCard({ course, progress }) {
         children: [
           i("span", {
             className: "hub-kicker",
-            children: learnSay("ПРАКТИКУМ · 6 УРОКОВ", "WORKSHOP · 6 LESSONS"),
+            children: course.level
+              ? LEVEL_DETAILS[course.level].label +
+                learnSay(" · 6 УРОКОВ · СИМУЛЯТОР", " · 6 LESSONS · SIMULATOR")
+              : learnSay("ПРАКТИКУМ · 6 УРОКОВ", "WORKSHOP · 6 LESSONS"),
           }),
           i("h2", {
             children: i("a", {
@@ -197,6 +200,14 @@ function CourseCard({ course, progress }) {
             }),
           }),
           i("p", { children: learnCopy(course.short) }),
+          course.level
+            ? i("p", {
+                className: "course-card-fee",
+                children:
+                  learnSay("В группе · ", "Group · ") +
+                  money(COURSE_PRICES[course.id], "KZT"),
+              })
+            : null,
           progress
             ? i("div", {
                 className: "course-progress",
@@ -267,9 +278,60 @@ function CoursesPage() {
           ),
         ],
       }),
-      i("div", {
-        className: "hub-grid courses-grid",
-        children: COURSES.map((course) => i(CourseCard, { course }, course.id)),
+      ...["seo", "google-ads"].map((topic) =>
+        i(
+          "section",
+          {
+            className: "hub-section course-track",
+            children: [
+              i("div", {
+                className: "hub-section-top",
+                children: [
+                  i("h2", { children: topic === "seo" ? "SEO" : "Google Ads" }),
+                  i("a", {
+                    href: simulatorLink(topic),
+                    children: learnSay(
+                      "Попробовать симулятор ↗",
+                      "Try the simulator ↗",
+                    ),
+                  }),
+                ],
+              }),
+              i("div", {
+                className: "hub-grid three",
+                children: COURSES.filter(
+                  (course) => course.topic === topic,
+                ).map((course) => i(CourseCard, { course }, course.id)),
+              }),
+            ],
+          },
+          topic,
+        ),
+      ),
+      i(CoursePricingTable, {}),
+      i("section", {
+        className: "hub-section",
+        children: [
+          i("h2", {
+            children: learnSay(
+              "Вводные и дополнительные практикумы",
+              "Introductory and additional workshops",
+            ),
+          }),
+          i("p", {
+            className: "hub-small",
+            children: learnSay(
+              "Вводные практикумы SEO и Google Ads входят в основу программ Junior. Аналитика и ИИ дополняют любой уровень.",
+              "The introductory SEO and Google Ads workshops form the foundation of Junior programs. Analytics and AI complement every level.",
+            ),
+          }),
+          i("div", {
+            className: "hub-grid courses-grid",
+            children: COURSES.filter((course) => !course.level).map((course) =>
+              i(CourseCard, { course }, course.id),
+            ),
+          }),
+        ],
       }),
       i("section", {
         className: "hub-section",
@@ -301,10 +363,10 @@ function CoursesPage() {
               ],
               [
                 "03",
-                learnSay("Для команды", "For teams"),
+                learnSay("С наставником", "With a mentor"),
                 learnSay(
-                  "Адаптируем программу под процессы компании, роли и требования к результату.",
-                  "Adapt the curriculum to your company processes, roles and expected outcomes.",
+                  "Самостоятельная работа по персональному плану и подробный разбор проекта на контрольных встречах.",
+                  "Independent work following a personal plan, with detailed project feedback at milestone meetings.",
                 ),
               ],
             ].map(([number, title, text]) =>
@@ -348,16 +410,21 @@ function CoursePage() {
         className: "course-hero",
         children: [
           i(HubHeading, {
-            eyebrow: learnSay(
-              "ПРАКТИКУМ · БАЗОВЫЙ УРОВЕНЬ",
-              "WORKSHOP · FOUNDATION LEVEL",
-            ),
+            eyebrow: course.level
+              ? learnSay("КУРС · ", "COURSE · ") +
+                LEVEL_DETAILS[course.level].label
+              : learnSay(
+                  "ПРАКТИКУМ · БАЗОВЫЙ УРОВЕНЬ",
+                  "WORKSHOP · FOUNDATION LEVEL",
+                ),
             title: learnCopy(course.title),
             text: learnCopy(course.short),
             actions: [
               hubButton(
                 learnSay("Обсудить обучение ↗", "Discuss training ↗"),
-                inquiryLink("training"),
+                course.level
+                  ? courseInquiryLink(course)
+                  : inquiryLink("training"),
               ),
               hubButton(
                 learnSay("Открыть демоуроки", "Open demo lessons"),
@@ -393,17 +460,18 @@ function CoursePage() {
                       "Ориентир для самостоятельной работы",
                       "Self-study estimate",
                     ),
-                    learnSay(
-                      "4–6 часов с практикой",
-                      "4–6 hours including practice",
-                    ),
+                    course.effort
+                      ? learnCopy(course.effort)
+                      : learnSay(
+                          "4–6 часов с практикой",
+                          "4–6 hours including practice",
+                        ),
                   ],
                   [
-                    learnSay(
-                      "Стоимость с сопровождением",
-                      "Guided training fee",
-                    ),
-                    money(COURSE_PRICES[course.id]),
+                    learnSay("В группе, вся программа", "Group, full program"),
+                    course.level
+                      ? money(COURSE_PRICES[course.id], "KZT")
+                      : money(COURSE_PRICES[course.id]),
                   ],
                 ].map(([label, value]) =>
                   i(
@@ -418,11 +486,20 @@ function CoursePage() {
                   ),
                 ),
               }),
-              i(CurrencySelector, {}),
+              course.level
+                ? i("a", {
+                    href: "#course-prices",
+                    children: learnSay(
+                      "Все форматы и цены ↓",
+                      "All formats and fees ↓",
+                    ),
+                  })
+                : i(CurrencySelector, {}),
             ],
           }),
         ],
       }),
+      i(CoursePricePlans, { course }),
       i("section", {
         className: "hub-grid two hub-section",
         children: [
@@ -534,6 +611,7 @@ function CoursePage() {
           }),
         ],
       }),
+      i(CourseSimulator, { course }),
       i("section", {
         className: "hub-section",
         children: [
@@ -964,6 +1042,39 @@ function ClassroomLesson({ course, lesson }) {
               }),
               i("h2", { children: learnSay("Ваша практика", "Your exercise") }),
               i("p", { children: learnCopy(lesson.practice) }),
+              course.simulator
+                ? i("aside", {
+                    className: "lesson-simulator-link",
+                    children: [
+                      i("strong", {
+                        children: learnSay(
+                          "Практика в симуляторе",
+                          "Simulator practice",
+                        ),
+                      }),
+                      i("p", {
+                        children: learnSay(
+                          "Проверьте решения на учебных данных, затем вернитесь к уроку. Результат тренажёра не заменяет тест и самостоятельную работу.",
+                          "Test decisions on teaching data, then return to the lesson. Simulator results do not replace the quiz or your independent work.",
+                        ),
+                      }),
+                      i("a", {
+                        href: simulatorLink(
+                          course.simulator,
+                          course.level,
+                          course.id,
+                        ),
+                        children:
+                          learnSay(
+                            "Открыть задания уровня ",
+                            "Open tasks for ",
+                          ) +
+                          LEVEL_DETAILS[course.level].label +
+                          " →",
+                      }),
+                    ],
+                  })
+                : null,
               i("p", {
                 className: "hub-small",
                 children: learnSay(

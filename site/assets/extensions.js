@@ -853,6 +853,26 @@ function composeInquiry(
     lines.push(
       `${ru ? "Формат" : "Format"}: ${translate(trainingFormat.pkg)} · ${money(servicePrices(service.id, trainingFormat.pkg), currency, language)}`,
     );
+  const selectedTrainingCourse =
+    service?.id === "training" &&
+    values.course &&
+    typeof COURSES !== "undefined"
+      ? COURSES.find((course) => course.id === values.course && course.level)
+      : null;
+  if (selectedTrainingCourse) {
+    const format =
+      COURSE_FORMATS.find((item) => item.id === values.courseFormat) ||
+      COURSE_FORMATS[0];
+    const prices = COURSE_FORMAT_PRICES[selectedTrainingCourse.id][format.id];
+    lines.push(
+      `${ru ? "Курс" : "Course"}: ${selectedTrainingCourse.title[language]}`,
+      `${ru ? "Формат курса" : "Course format"}: ${format.title[language]} · ${money(prices, currency, language)}`,
+    );
+    if (currency !== "KZT" && !Number.isFinite(prices[currency]))
+      lines.push(
+        `${ru ? "Базовая цена" : "Base fee"}: ${money(prices, "KZT", language)}`,
+      );
+  }
   lines.push(
     `${ru ? "Валюта" : "Currency"}: ${currency}`,
     "",
@@ -888,6 +908,19 @@ function messengerLink(channel, message) {
 function InquiryForm() {
   const params = new URLSearchParams(location.search);
   const [values, setValues] = le.useState({
+    course:
+      params.get("service") === "training" &&
+      typeof COURSES !== "undefined" &&
+      COURSES.some(
+        (course) => course.level && course.id === params.get("course"),
+      )
+        ? params.get("course")
+        : "",
+    courseFormat:
+      typeof COURSE_FORMATS !== "undefined" &&
+      COURSE_FORMATS.some((format) => format.id === params.get("format"))
+        ? params.get("format")
+        : "group",
     service: tu.some((item) => item.id === params.get("service"))
       ? params.get("service")
       : "",
@@ -916,7 +949,7 @@ function InquiryForm() {
     setValues((previous) => ({
       ...previous,
       [name]: value,
-      ...(name === "service" ? { plan: "", package: "" } : {}),
+      ...(name === "service" ? { plan: "", package: "", course: "" } : {}),
     }));
     setStatus("");
   };
@@ -985,7 +1018,54 @@ function InquiryForm() {
               }),
             ],
           }),
-          values.service === "training"
+          values.service === "training" && values.course
+            ? i("div", {
+                className: "form-field form-wide",
+                children: [
+                  i("strong", {
+                    children: learnCopy(
+                      COURSES.find((course) => course.id === values.course)
+                        .title,
+                    ),
+                  }),
+                  i("label", {
+                    children: [
+                      learnSay("Формат курса", "Course format"),
+                      i("select", {
+                        name: "courseFormat",
+                        value: values.courseFormat,
+                        onChange: update,
+                        children: COURSE_FORMATS.map((format) =>
+                          i(
+                            "option",
+                            {
+                              value: format.id,
+                              children:
+                                learnCopy(format.title) +
+                                " · " +
+                                money(
+                                  COURSE_FORMAT_PRICES[values.course][
+                                    format.id
+                                  ],
+                                ),
+                            },
+                            format.id,
+                          ),
+                        ),
+                      }),
+                    ],
+                  }),
+                  i("a", {
+                    href: pageLink("courses.html"),
+                    children: learnSay(
+                      "Выбрать другой курс",
+                      "Choose another course",
+                    ),
+                  }),
+                ],
+              })
+            : null,
+          values.service === "training" && !values.course
             ? i("label", {
                 className: "form-field form-wide",
                 children: [

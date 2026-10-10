@@ -332,6 +332,11 @@ function siteMapGroups() {
       title: learnSay("Обучение и материалы", "Learning and resources"),
       links: [
         page(learnSay("Все курсы", "All courses"), "courses.html"),
+        page(learnSay("Симулятор SEO", "SEO simulator"), "seo-simulator.html"),
+        page(
+          learnSay("Симулятор Google Ads", "Google Ads simulator"),
+          "google-ads-simulator.html",
+        ),
         page(
           learnSay("Учебный демо-кабинет", "Demo classroom"),
           "academy.html",

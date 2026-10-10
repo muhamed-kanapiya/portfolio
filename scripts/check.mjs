@@ -11,6 +11,8 @@ for (const filename of await readdir(path.join(site, "assets"))) {
     });
 }
 for (const page of [
+  "seo-simulator.html",
+  "google-ads-simulator.html",
   "courses.html",
   "course.html",
   "academy.html",
@@ -87,7 +89,7 @@ assert(
   "Detailed translations are missing",
 );
 console.log(
-  "Checked JavaScript, thirty-one HTML pages, local assets, client data and translations.",
+  "Checked JavaScript, thirty-three HTML pages, local assets, client data and translations.",
 );
 
 // Verify the new behavior without adding demo clients to the actual website.
@@ -1000,9 +1002,12 @@ console.log(
 
 for (const hubFile of [
   "learning-data.js",
+  "course-levels.js",
+  "simulator-models.js",
   "resources-data.js",
   "travel-data.js",
   "learning.js",
+  "simulators.js",
   "resources.js",
   "travel.js",
   "announcements.js",
@@ -1447,6 +1452,8 @@ for (const language of ["ru", "en"]) {
   vm.runInContext("currentLanguage=" + JSON.stringify(language), behavior);
   for (const [file, page, key, id] of [
     ["courses.html", "courses"],
+    ["seo-simulator.html", "seo-simulator", "level", "senior"],
+    ["google-ads-simulator.html", "google-ads-simulator", "level", "middle"],
     ["course.html", "course", "course", "google-ads"],
     ["academy.html", "academy"],
     ["classroom.html", "classroom", "course", "seo"],
@@ -1490,5 +1497,165 @@ for (const filename of ["academy.html", "classroom.html", "exam.html"])
     ),
   );
 console.log(
-  "Checked 4 bilingual courses, 24 lessons, exam thresholds and malformed progress, 10 real downloads, 14 videos and sanitized course/resource/video links.",
+  "Checked 10 bilingual courses, 60 lesson entries, exam thresholds and malformed progress, 10 real downloads, 14 videos and sanitized course/resource/video links.",
+);
+// Exercise every scenario against the actual model, including budgets and failure paths.
+const simData = vm.runInContext(
+  "({SIM_TASKS,SEO_ACTIONS,COURSE_FORMAT_PRICES})",
+  behavior,
+);
+assert.equal(allCourses.filter((course) => course.level).length, 6);
+const expectedGroupFees = [50000, 150000, 250000, 80000, 170000, 300000];
+Object.values(simData.COURSE_FORMAT_PRICES).forEach((formats, index) => {
+  assert.equal(formats.group.KZT, expectedGroupFees[index]);
+  assert(formats.individual.KZT > formats.group.KZT);
+  assert(formats.mentor.KZT > formats.individual.KZT);
+  for (const prices of Object.values(formats)) {
+    assert.equal(prices.USD, null);
+    assert.equal(prices.RUB, null);
+  }
+});
+const model = (topic, input, task) => {
+  state.simInput = input;
+  state.simTaskFixture = task;
+  return vm.runInContext(
+    topic === "seo"
+      ? "simulateSEO(simInput,simTaskFixture)"
+      : "simulateAds(simInput)",
+    behavior,
+  );
+};
+const passes = (topic, task, result) => {
+  state.simResult = result;
+  state.simTaskFixture = task;
+  return vm.runInContext(
+    `simulatorChecks(${JSON.stringify(topic)},simTaskFixture,simResult).every(check=>check.passed)`,
+    behavior,
+  );
+};
+for (const [topic, tasks] of Object.entries(simData.SIM_TASKS)) {
+  assert.equal(tasks.length, 6);
+  for (const level of ["junior", "middle", "senior"])
+    assert.equal(tasks.filter((task) => task.level === level).length, 2);
+  for (const task of tasks) {
+    const initial = vm.runInContext(
+      `({...SIM_DEFAULTS[${JSON.stringify(topic)}]})`,
+      behavior,
+    );
+    Object.assign(initial, task.defaults);
+    assert(
+      !passes(topic, task, model(topic, initial, task)),
+      `${topic}/${task.id} should require a decision`,
+    );
+    let solution;
+    if (topic === "seo") {
+      for (let mask = 0; mask < 32; mask++) {
+        const input = Object.fromEntries(
+          simData.SEO_ACTIONS.map((action, index) => [
+            action.id,
+            Boolean(mask & (1 << index)),
+          ]),
+        );
+        const result = model(topic, input, task);
+        assert(
+          result.series.every((row) =>
+            Object.values(row).every(Number.isFinite),
+          ),
+        );
+        if (passes(topic, task, result)) solution = input;
+      }
+    } else {
+      for (let budget = 100000; budget <= 400000; budget += 50000)
+        for (let allocation = 0; allocation <= 100; allocation += 10) {
+          const input = {
+            budget,
+            allocation,
+            negatives: true,
+            landing: true,
+            qualified: true,
+          };
+          const result = model(topic, input, task);
+          assert(result.spend <= budget + 1e-8);
+          assert(
+            Math.abs(
+              result.profit -
+                (result.revenue * 0.55 - result.spend - result.setup),
+            ) < 1e-8,
+          );
+          assert(
+            result.series.every((row) =>
+              Object.values(row).every(Number.isFinite),
+            ),
+          );
+          if (passes(topic, task, result)) solution = input;
+        }
+    }
+    assert(
+      solution,
+      `${topic}/${task.id} must be achievable with UI control values`,
+    );
+  }
+}
+const rawAds = model("google-ads", { budget: 300000, allocation: 50 });
+const reportOnly = model("google-ads", {
+  budget: 300000,
+  allocation: 50,
+  qualified: true,
+});
+assert.equal(
+  rawAds.quality,
+  reportOnly.quality,
+  "Changing the reporting goal cannot create leads",
+);
+assert.equal(rawAds.profit, reportOnly.profit);
+assert.equal(rawAds.spend, 300000);
+const clampedAds = model("google-ads", { budget: Infinity, allocation: NaN });
+assert.equal(clampedAds.budget, 300000);
+assert(!/NaN|Infinity/.test(JSON.stringify(clampedAds)));
+const migrationTask = simData.SIM_TASKS.seo.find(
+  (task) => task.id === "migration",
+);
+const unprotected = model("seo", {}, migrationTask),
+  protectedMigration = model("seo", { migration: true }, migrationTask);
+assert.equal(unprotected.series[0].value, protectedMigration.series[0].value);
+assert.equal(unprotected.clicks, protectedMigration.clicks * 0.65);
+const delayed = model("seo", { content: true }, simData.SIM_TASKS.seo[0]);
+assert.equal(delayed.series[2].value, 240);
+assert(delayed.series[8].value > delayed.series[3].value);
+console.log(
+  "Checked 18 manual course fees, 12 solvable simulator tasks, failing starting scenarios, demand caps, delayed SEO effects and profit formulas.",
+);
+for (const language of ["ru", "en"]) {
+  state.courseInquiryFixture = {
+    name: "QA",
+    contact: "example@example.com",
+    website: "",
+    message: "Training inquiry fixture",
+    service: "training",
+    course: "seo-middle",
+    courseFormat: "mentor",
+    package: "",
+    plan: "",
+  };
+  const message = vm.runInContext(
+    `composeInquiry(courseInquiryFixture,${JSON.stringify(language)},"KZT")`,
+    behavior,
+  );
+  assert(message.includes("SEO Middle"));
+  assert(/300[\s,]*000/.test(message));
+  assert(
+    message.includes(language === "ru" ? "С наставником" : "With a mentor"),
+  );
+  state.courseInquiryFixture.course = "unknown-course";
+  assert(
+    !vm
+      .runInContext(
+        `composeInquiry(courseInquiryFixture,${JSON.stringify(language)},"KZT")`,
+        behavior,
+      )
+      .includes("unknown-course"),
+  );
+}
+console.log(
+  "Checked course/format/fee attribution in both messenger draft languages and invalid-course rejection.",
 );
